@@ -55,6 +55,12 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
     List<BaUnitType> getBaUnitTypes(String languageCode);
 
     /**
+     * see {@linkplain AdministrativeEJB#getLeaseConditions(java.lang.String)
+     * AdministrativeEJB.getLeaseConditions}
+     */
+    List<LeaseCondition> getLeaseConditions(String languageCode);
+    
+    /**
      * see {@linkplain AdministrativeEJB#getMortgageTypes(java.lang.String)
      * AdministrativeEJB.getMortgageTypes}
      */
@@ -168,5 +174,9 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
     List<ValidationResult> publicDisplay(String params, String languageCode) ;
     
     List<SysRegManagement> getSysRegManagement(SysRegManagementParams params, String languageCode);
+    
+    List<SysRegStatus> getSysRegStatus(SysRegManagementParams params, String languageCode);
+    
+    List<SysRegProgress> getSysRegProgress(SysRegManagementParams params, String languageCode);
     
 }
