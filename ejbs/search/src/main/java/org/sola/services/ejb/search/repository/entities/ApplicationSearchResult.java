@@ -45,6 +45,8 @@ import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 @Table(name = "application", schema = "application")
 public class ApplicationSearchResult extends AbstractReadOnlyEntity {
 
+    public static final String SERVICE_STATUS_LODGED = "lodged";
+    public static final String SERVICE_STATUS_PENDING = "pending";
     public static final String QUERY_PARAM_USER_NAME = "userName";
     public static final String QUERY_PARAM_FROM_LODGE_DATE = "fromDate";
     public static final String QUERY_PARAM_TO_LODGE_DATE = "toDate";
@@ -114,13 +116,19 @@ public class ApplicationSearchResult extends AbstractReadOnlyEntity {
     private String agentId;
     @Column(name = "contact_person_id")
     private String contactPersonId;
+//    @AccessFunctions(onSelect = "(SELECT string_agg(tmp.display_value, ',') FROM "
+//    + " (SELECT get_translation(display_value, #{" + CommonSqlProvider.PARAM_LANGUAGE_CODE + "}) as display_value "
+//    + "  FROM application.service aps INNER JOIN application.request_type rt ON aps.request_type_code = rt.code "
+//    + "  WHERE aps.application_id = a.id ORDER BY aps.service_order) tmp) ")
+    // SOLA Tonga Customisation - only list the lastest incomplete service
     @AccessFunctions(onSelect = "(SELECT string_agg(tmp.display_value, ',') FROM "
-    + " (SELECT get_translation(display_value, #{" + CommonSqlProvider.PARAM_LANGUAGE_CODE + "}) as display_value "
-    + "  FROM application.service aps INNER JOIN application.request_type rt ON aps.request_type_code = rt.code "
-    + "  WHERE aps.application_id = a.id ORDER BY aps.service_order) tmp) ")
+            + " (SELECT get_translation(display_value, #{" + CommonSqlProvider.PARAM_LANGUAGE_CODE + "}) as display_value "
+            + "  FROM application.service aps INNER JOIN application.request_type rt ON aps.request_type_code = rt.code "
+            + "  WHERE aps.application_id = a.id AND aps.status_code IN ('" + SERVICE_STATUS_LODGED + "',"
+            + " '" + SERVICE_STATUS_PENDING + "') ORDER BY aps.service_order LIMIT 1) tmp) ")
     @Column(name = "service_list")
     private String serviceList;
-    @Column(name = "fee_paid")
+    @Column(name = "fee_paid") 
     private Boolean feePaid;
 
     public ApplicationSearchResult() {
