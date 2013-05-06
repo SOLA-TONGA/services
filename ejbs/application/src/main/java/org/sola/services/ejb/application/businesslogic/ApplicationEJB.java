@@ -450,6 +450,11 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
     public List<RequestType> getRequestTypes(String languageCode) {
         return getRepository().getCodeList(RequestType.class, languageCode);
     }
+    
+    /*@Override
+    public List<ChecklistGroup> getChecklistGroups(String languageCode) {
+        return getRepository().getCodeList(ChecklistGroup.class, languageCode);
+    }*/
 
     /**
      * Retrieves all application.application_status_type code values.
