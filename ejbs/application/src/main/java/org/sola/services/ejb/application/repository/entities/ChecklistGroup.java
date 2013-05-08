@@ -31,7 +31,9 @@
  */
 package org.sola.services.ejb.application.repository.entities;
 
+import java.util.List;
 import javax.persistence.Table;
+import org.sola.services.common.repository.ChildEntityList;
 import org.sola.services.common.repository.entities.AbstractCodeEntity;
 
 /**
@@ -40,7 +42,20 @@ import org.sola.services.common.repository.entities.AbstractCodeEntity;
  */
 @Table(name = "checklist_group", schema = "application")
 public class ChecklistGroup extends AbstractCodeEntity{
+    
+    @ChildEntityList(parentIdField = "checklistGroupCode", childIdField = "checklistItemCode",
+    manyToManyClass = ChecklistItemInGroup.class)
+    private List<ChecklistItem> checklistItemList;
+    
     public ChecklistGroup(){
         super();
+    }
+    
+    public List<ChecklistItem> getChecklistItemList() {
+        return checklistItemList;
+    }
+
+    public void setChecklistItemList(List<ChecklistItem> checklistItemList) {
+        this.checklistItemList = checklistItemList;
     }
 }

@@ -31,38 +31,43 @@
  */
 package org.sola.services.ejb.application.repository.entities;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.Table;
-import org.sola.services.common.repository.ChildEntityList;
-import org.sola.services.common.repository.entities.AbstractCodeEntity;
-import org.sola.services.ejb.source.repository.entities.Source;
+import org.sola.services.common.repository.entities.AbstractEntity;
 
 /**
  *
  * @author Admin
  */
 @Table(name = "checklist_item_in_group", schema = "application")
-public class ChecklistItemInGroup extends AbstractCodeEntity{
+public class ChecklistItemInGroup extends AbstractEntity {
     
-    /*@Column(name = "checklist_group_code")
+    @Id
+    @Column(name = "checklist_group_code")
     private String checklistGroupCode;
+    @Id
     @Column(name = "checklist_item_code")
-    private String checklistItemCode;*/
-    @ChildEntityList(parentIdField = "checklist_group_code", childIdField = "checklist_item_code",
-        manyToManyClass = ChecklistItemInGroup.class)
-    private List<ChecklistItem> checklistItemList;
+    private String checklistItemCode;
       
     public ChecklistItemInGroup(){
         super();
     }
     
-    public List<ChecklistItem> getChecklistItemList() {
-        checklistItemList = checklistItemList == null ? new ArrayList<ChecklistItem>() : checklistItemList;
-        return checklistItemList;
+    public String getChecklistGroupCode() {
+        return checklistGroupCode;
     }
 
-    public void setSourceList(List<ChecklistItem> checklistItemList) {
-        this.checklistItemList = checklistItemList;
+    public void setChecklistGroupCode(String groupCode) {
+        this.checklistGroupCode = groupCode;
     }
+    
+    public String getChecklistItemCode() {
+        return checklistItemCode;
+    }
+
+    public void setChecklistItemCode(String itemCode) {
+        this.checklistItemCode = itemCode;
+    }
+    
 }
