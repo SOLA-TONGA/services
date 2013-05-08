@@ -1315,7 +1315,9 @@ public class CommonRepositoryImpl implements CommonRepository {
 
                 // Create a WHERE clause that will use a nested select on the Many to Many entity
                 // to restrict the selection of records from the target child entity table. 
-                String whereClause = "id IN ( SELECT a." + childIdColumn
+                // Determine the name of the id column on the child first. 
+                String childIdColumnName = RepositoryUtility.getIdColumns(childEntityClass).get(0).getColumnName(); 
+                String whereClause = childIdColumnName + " IN ( SELECT a." + childIdColumn
                         + " FROM " + RepositoryUtility.getTableName(manyToManyClass) + " a "
                         + " WHERE a." + parentIdColumn + " = #{parentId})";
                 params.put(CommonSqlProvider.PARAM_WHERE_PART, whereClause);
