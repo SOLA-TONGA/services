@@ -1289,4 +1289,32 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
         return getRepository().getEntityList(SysRegCertificates.class,
                 SysRegCertificates.QUERY_WHERE_BYNR, params);
     }
+    
+    @Override
+    public List<ServiceChecklistItem> saveServiceChecklistItem(List<ServiceChecklistItem> serviceChecklistItem) { 
+        if (serviceChecklistItem != null) {
+            ListIterator<ServiceChecklistItem> it = serviceChecklistItem.listIterator();
+            while (it.hasNext()) {
+                ServiceChecklistItem item = it.next(); 
+                it.remove();   
+                ServiceChecklistItem  savedItem = saveEntity(item);
+                if (savedItem != null) {
+                    it.add(savedItem);
+                }
+            }   
+        }   
+        return serviceChecklistItem;   
+    }
+    
+    @Override
+    public List<ServiceChecklistItem> getServiceChecklistItem(String serviceId){
+        List<ServiceChecklistItem> result = null;
+        Map params = new HashMap<String, Object>();
+        params.put(CommonSqlProvider.PARAM_WHERE_PART, ServiceChecklistItem.QUERY_WHERE_BYSERVICEID);
+        params.put(ServiceChecklistItem.QUERY_PARAMETER_SERVICE_ID, serviceId);
+        result = getRepository().getEntityList(ServiceChecklistItem.class, params);
+        return result;
+    }
+    
+    
 }

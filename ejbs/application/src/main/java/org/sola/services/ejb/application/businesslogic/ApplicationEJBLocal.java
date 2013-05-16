@@ -271,5 +271,8 @@ public interface ApplicationEJBLocal extends AbstractEJBLocal {
      * CadastreEJB.SysRegPubDisParcelName}.
      */
     List<SysRegCertificates> getSysRegCertificatesByApplication(String searchString, String nr);
-
+    
+    List<ServiceChecklistItem> saveServiceChecklistItem(List<ServiceChecklistItem> serviceChecklistItem);
+    
+    List<ServiceChecklistItem> getServiceChecklistItem(String serviceId);
 }
