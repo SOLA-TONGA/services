@@ -1291,6 +1291,7 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
     }
     
     @Override
+    @RolesAllowed(RolesConstants.APPLICATION_EDIT_APPS)
     public List<ServiceChecklistItem> saveServiceChecklistItem(List<ServiceChecklistItem> serviceChecklistItem) { 
         if (serviceChecklistItem != null) {
             ListIterator<ServiceChecklistItem> it = serviceChecklistItem.listIterator();
@@ -1307,6 +1308,7 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
     }
     
     @Override
+    @RolesAllowed(RolesConstants.APPLICATION_VIEW_APPS)
     public List<ServiceChecklistItem> getServiceChecklistItem(String serviceId){
         List<ServiceChecklistItem> result = null;
         Map params = new HashMap<String, Object>();
