@@ -46,6 +46,7 @@ import org.sola.services.ejb.application.repository.entities.*;
 import org.sola.services.ejb.party.repository.entities.Party;
 import org.sola.services.ejb.source.businesslogic.SourceEJBLocal;
 import org.sola.services.ejb.source.repository.entities.Source;
+import org.sola.services.ejb.system.br.Result;
 import org.sola.services.ejb.system.businesslogic.SystemEJBLocal;
 import org.sola.services.ejb.system.repository.entities.BrValidation;
 import org.sola.services.ejb.transaction.businesslogic.TransactionEJBLocal;
@@ -201,7 +202,7 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
                 application.setExpectedCompletionDate(
                         DateUtility.maxDate(ser.getExpectedCompletionDate(),
                         application.getExpectedCompletionDate()));
-                
+
                 // Reset the base date if the service has not been cancelled
                 if (!ServiceStatusType.STATUS_CANCELLED.equals(ser.getStatusCode())) {
                     baseDate = ser.getExpectedCompletionDate();
@@ -270,7 +271,17 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
                 Money baseFee = new Money(BigDecimal.ZERO);
                 Money areaFee = new Money(BigDecimal.ZERO);
                 Money valueFee = new Money(BigDecimal.ZERO);
-                if (requestTypes != null) {
+
+                if (ser.getRequestTypeCode().equals(RequestType.SURVEY)) {
+                    // Tonga Extension - calculate the fee for the survey service using
+                    // the calculate survey fee business rule. 
+                    HashMap<String, Serializable> params = new HashMap<String, Serializable>();
+                    params.put("area", totalArea.intValue());
+                    Result surveyFee = systemEJB.checkRuleGetResultSingle("calculate-survey-fee", params);
+                    if (surveyFee != null && surveyFee.getValue() != null) {
+                        areaFee = new Money(new BigDecimal(surveyFee.getValue().toString()).setScale(2));
+                    }
+                } else if (requestTypes != null) {
                     for (RequestType type : requestTypes) {
                         if (ser.getRequestTypeCode().equals(type.getCode())) {
                             if (type.getBaseFee() != null) {
@@ -450,12 +461,11 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
     public List<RequestType> getRequestTypes(String languageCode) {
         return getRepository().getCodeList(RequestType.class, languageCode);
     }
-    
-    /*@Override
-    public List<ChecklistGroup> getChecklistGroups(String languageCode) {
-        return getRepository().getCodeList(ChecklistGroup.class, languageCode);
-    }*/
 
+    /*@Override
+     public List<ChecklistGroup> getChecklistGroups(String languageCode) {
+     return getRepository().getCodeList(ChecklistGroup.class, languageCode);
+     }*/
     /**
      * Retrieves all application.application_status_type code values.
      *
@@ -1020,7 +1030,7 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
 
     /**
      * Wrapper method that uses the applicationId to load the application object
-     * before calling      {@linkplain #takeActionAgainstApplication(org.sola.services.ejb.application.repository.entities.ApplicationActionTaker,
+     * before calling null null null null null     {@linkplain #takeActionAgainstApplication(org.sola.services.ejb.application.repository.entities.ApplicationActionTaker,
      * java.lang.String, java.lang.String, int) takeActionAgainstApplication.
      *
      * @param applicationId The identifier of the application to perform the action against
@@ -1289,27 +1299,27 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
         return getRepository().getEntityList(SysRegCertificates.class,
                 SysRegCertificates.QUERY_WHERE_BYNR, params);
     }
-    
+
     @Override
     @RolesAllowed(RolesConstants.APPLICATION_EDIT_APPS)
-    public List<ServiceChecklistItem> saveServiceChecklistItem(List<ServiceChecklistItem> serviceChecklistItem) { 
+    public List<ServiceChecklistItem> saveServiceChecklistItem(List<ServiceChecklistItem> serviceChecklistItem) {
         if (serviceChecklistItem != null) {
             ListIterator<ServiceChecklistItem> it = serviceChecklistItem.listIterator();
             while (it.hasNext()) {
-                ServiceChecklistItem item = it.next(); 
-                it.remove();   
-                ServiceChecklistItem  savedItem = saveEntity(item);
+                ServiceChecklistItem item = it.next();
+                it.remove();
+                ServiceChecklistItem savedItem = saveEntity(item);
                 if (savedItem != null) {
                     it.add(savedItem);
                 }
-            }   
-        }   
-        return serviceChecklistItem;   
+            }
+        }
+        return serviceChecklistItem;
     }
-    
+
     @Override
     @RolesAllowed(RolesConstants.APPLICATION_VIEW_APPS)
-    public List<ServiceChecklistItem> getServiceChecklistItem(String serviceId){
+    public List<ServiceChecklistItem> getServiceChecklistItem(String serviceId) {
         List<ServiceChecklistItem> result = null;
         Map params = new HashMap<String, Object>();
         params.put(CommonSqlProvider.PARAM_WHERE_PART, ServiceChecklistItem.QUERY_WHERE_BYSERVICEID);
@@ -1317,6 +1327,4 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
         result = getRepository().getEntityList(ServiceChecklistItem.class, params);
         return result;
     }
-    
-    
 }
