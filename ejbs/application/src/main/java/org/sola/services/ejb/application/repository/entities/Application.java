@@ -118,10 +118,9 @@ public class Application extends AbstractVersionedEntity {
     @ChildEntityList(parentIdField = "applicationId", childIdField = "sourceId",
             manyToManyClass = ApplicationUsesSource.class)
     private List<Source> sourceList;
-    
-    @Column(name="expected_inspection_date")
+    @Column(name = "expected_inspection_date")
     private Date expectedInspectionDate;
-    @Column(name="inspection_completed")
+    @Column(name = "inspection_completed")
     private boolean inspectionCompleted;
 
     public Application() {
@@ -341,6 +340,14 @@ public class Application extends AbstractVersionedEntity {
             setNr(generateApplicationNumber());
         }
 
+        // Set the reference id on the source so that it is possible to 
+        // generate a number for the source that uses the Application number
+        if (getSourceList() != null && getSourceList().size() > 0) {
+            for (Source source : getSourceList()) {
+                source.setLaNrReferenceId(getId());
+            }
+        }
+
         super.preSave();
     }
 
@@ -367,20 +374,20 @@ public class Application extends AbstractVersionedEntity {
         }
         return services;
     }
-    
-    public Date getExpectedInspectionDate(){
+
+    public Date getExpectedInspectionDate() {
         return expectedInspectionDate;
     }
-    
-    public void setExpectedInspectionDate(Date date){
+
+    public void setExpectedInspectionDate(Date date) {
         this.expectedCompletionDate = date;
     }
-    
-    public boolean isInspectionCompleted(){
+
+    public boolean isInspectionCompleted() {
         return inspectionCompleted;
     }
-    
-    public void setInspectionCompleted(boolean completed){
+
+    public void setInspectionCompleted(boolean completed) {
         this.inspectionCompleted = completed;
     }
 }

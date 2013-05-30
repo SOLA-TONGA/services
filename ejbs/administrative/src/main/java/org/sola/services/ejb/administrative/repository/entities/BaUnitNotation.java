@@ -31,7 +31,9 @@
  */
 package org.sola.services.ejb.administrative.repository.entities;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -43,7 +45,6 @@ import org.sola.services.ejb.system.br.Result;
 import org.sola.services.ejb.system.businesslogic.SystemEJBLocal;
 import org.sola.services.ejb.transaction.businesslogic.TransactionEJBLocal;
 import org.sola.services.ejb.transaction.repository.entities.Transaction;
-import org.sola.services.ejb.transaction.repository.entities.TransactionBasic;
 import org.sola.services.ejb.transaction.repository.entities.TransactionStatusType;
 
 /**
@@ -103,7 +104,11 @@ public class BaUnitNotation extends AbstractVersionedEntity {
         String result = "";
         SystemEJBLocal systemEJB = RepositoryUtility.tryGetEJB(SystemEJBLocal.class);
         if (systemEJB != null) {
-            Result newNumberResult = systemEJB.checkRuleGetResultSingle("generate-notation-reference-nr", null);
+            // Tonga customization. Base the nr reference on the application number
+            HashMap<String, Serializable> params = new HashMap<String, Serializable>();
+            params.put("transactionId", this.getTransactionId());
+            params.put("rrrId", this.getRrrId());
+            Result newNumberResult = systemEJB.checkRuleGetResultSingle("generate-notation-reference-nr", params);
             if (newNumberResult != null && newNumberResult.getValue() != null) {
                 result = newNumberResult.getValue().toString();
             }

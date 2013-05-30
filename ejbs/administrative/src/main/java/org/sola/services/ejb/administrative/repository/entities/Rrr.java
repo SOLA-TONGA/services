@@ -1,28 +1,30 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2012 - Food and Agriculture Organization of the United Nations (FAO).
- * All rights reserved.
+ * Copyright (C) 2012 - Food and Agriculture Organization of the United Nations
+ * (FAO). All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *    1. Redistributions of source code must retain the above copyright notice,this list
- *       of conditions and the following disclaimer.
- *    2. Redistributions in binary form must reproduce the above copyright notice,this list
- *       of conditions and the following disclaimer in the documentation and/or other
- *       materials provided with the distribution.
- *    3. Neither the name of FAO nor the names of its contributors may be used to endorse or
- *       promote products derived from this software without specific prior written permission.
+ * 1. Redistributions of source code must retain the above copyright notice,this
+ * list of conditions and the following disclaimer. 2. Redistributions in binary
+ * form must reproduce the above copyright notice,this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution. 3. Neither the name of FAO nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,STRICT LIABILITY,OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT,STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
 /*
@@ -51,11 +53,12 @@ import org.sola.services.ejb.transaction.repository.entities.Transaction;
 import org.sola.services.ejb.transaction.repository.entities.TransactionStatusType;
 
 /**
- * Entity representing administrative.rrr table. 
+ * Entity representing administrative.rrr table.
+ *
  * @author soladev
  */
 @Table(name = "rrr", schema = "administrative")
-@DefaultSorter(sortString="status_code, nr")
+@DefaultSorter(sortString = "status_code, nr")
 public class Rrr extends AbstractVersionedEntity {
 
     public static final String QUERY_PARAMETER_TRANSACTIONID = "transactionId";
@@ -85,7 +88,7 @@ public class Rrr extends AbstractVersionedEntity {
     private Double share;
     @Column(name = "amount")
     private BigDecimal amount;
-    @Column(name="due_date")
+    @Column(name = "due_date")
     private Date dueDate;
     @Column(name = "mortgage_interest_rate")
     private BigDecimal mortgageInterestRate;
@@ -101,15 +104,15 @@ public class Rrr extends AbstractVersionedEntity {
     @ChildEntityList(parentIdField = "rrrId", cascadeDelete = true)
     private List<LeaseConditionForRrr> leaseConditionList;
     @ExternalEJB(ejbLocalClass = SourceEJBLocal.class,
-    loadMethod = "getSources", saveMethod = "saveSource")
+            loadMethod = "getSources", saveMethod = "saveSource")
     @ChildEntityList(parentIdField = "rrrId", childIdField = "sourceId",
-    manyToManyClass = SourceDescribesRrr.class)
+            manyToManyClass = SourceDescribesRrr.class)
     private List<Source> sourceList;
     @ExternalEJB(ejbLocalClass = PartyEJBLocal.class, loadMethod = "getParties")
     @ChildEntityList(parentIdField = "rrrId", childIdField = "partyId",
-    manyToManyClass = PartyForRrr.class, readOnly = true)
+            manyToManyClass = PartyForRrr.class, readOnly = true)
     private List<Party> rightHolderList;
-    @Column(insertable=false, updatable=false, name = "concatenated_name")
+    @Column(insertable = false, updatable = false, name = "concatenated_name")
     @AccessFunctions(onSelect = "administrative.get_concatenated_name(ba_unit_id)")
     private String concatenatedName;
 
@@ -120,7 +123,6 @@ public class Rrr extends AbstractVersionedEntity {
     public void setConcatenatedName(String concatenatedName) {
         this.concatenatedName = concatenatedName;
     }
-    
     // Other fields
     private Boolean locked = null;
 
@@ -331,6 +333,14 @@ public class Rrr extends AbstractVersionedEntity {
         if (isNew() && getNr() == null) {
             // Assign a generated number to the Rrr if it is not currently set. 
             setNr(generateRrrNumber());
+        }
+
+        // Set the reference id on the source so that it is possible to 
+        // generate a number for the source that uses the rrr number
+        if (getSourceList() != null && getSourceList().size() > 0) {
+            for (Source source : getSourceList()) {
+                source.setLaNrReferenceId(getId());
+            }
         }
         super.preSave();
     }
