@@ -380,7 +380,7 @@ public class Application extends AbstractVersionedEntity {
     }
 
     public void setExpectedInspectionDate(Date date) {
-        this.expectedCompletionDate = date;
+        this.expectedInspectionDate = date;
     }
 
     public boolean isInspectionCompleted() {
