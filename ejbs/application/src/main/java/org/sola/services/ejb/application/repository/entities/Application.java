@@ -118,10 +118,6 @@ public class Application extends AbstractVersionedEntity {
     @ChildEntityList(parentIdField = "applicationId", childIdField = "sourceId",
             manyToManyClass = ApplicationUsesSource.class)
     private List<Source> sourceList;
-    @Column(name = "expected_inspection_date")
-    private Date expectedInspectionDate;
-    @Column(name = "inspection_completed")
-    private boolean inspectionCompleted;
 
     public Application() {
         super();
@@ -373,21 +369,5 @@ public class Application extends AbstractVersionedEntity {
             });
         }
         return services;
-    }
-
-    public Date getExpectedInspectionDate() {
-        return expectedInspectionDate;
-    }
-
-    public void setExpectedInspectionDate(Date date) {
-        this.expectedInspectionDate = date;
-    }
-
-    public boolean isInspectionCompleted() {
-        return inspectionCompleted;
-    }
-
-    public void setInspectionCompleted(boolean completed) {
-        this.inspectionCompleted = completed;
     }
 }
