@@ -68,6 +68,24 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private String baUnitId;
     @Column(name = "land_use_code")
     private String landUseCode;
+    
+    // SOLA Tonga extensions
+    @Column(name = "lease_number")
+    private String leaseNumber;
+    @Column(name = "lease_term")
+    private BigDecimal leaseTerm;
+    @Column(name = "lease_area")
+    private BigDecimal leaseArea;
+    @Column(name = "amount")
+    private BigDecimal amount;
+    @Column(name = "lessor_name")
+    private String lessorName;
+    @Column(name = "district")
+    private String district;
+    @Column(name = "noble_estate")
+    private String nobelEstate;
+    @Column(name = "description")
+    private String description;
 
     public ApplicationProperty() {
         super();
@@ -152,5 +170,69 @@ public class ApplicationProperty extends AbstractVersionedEntity {
 
     public void setVerifiedLocation(boolean verifiedLocation) {
         this.verifiedLocation = verifiedLocation;
+    }
+
+    public String getLeaseNumber() {
+        return leaseNumber;
+    }
+
+    public void setLeaseNumber(String leaseNumber) {
+        this.leaseNumber = leaseNumber;
+    }
+
+    public BigDecimal getLeaseTerm() {
+        return leaseTerm;
+    }
+
+    public void setLeaseTerm(BigDecimal leaseTerm) {
+        this.leaseTerm = leaseTerm;
+    }
+
+    public BigDecimal getLeaseArea() {
+        return leaseArea;
+    }
+
+    public void setLeaseArea(BigDecimal leaseArea) {
+        this.leaseArea = leaseArea;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getLessorName() {
+        return lessorName;
+    }
+
+    public void setLessorName(String lessorName) {
+        this.lessorName = lessorName;
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public String getNobelEstate() {
+        return nobelEstate;
+    }
+
+    public void setNobelEstate(String nobelEstate) {
+        this.nobelEstate = nobelEstate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
