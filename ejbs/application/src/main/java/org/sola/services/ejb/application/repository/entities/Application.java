@@ -102,6 +102,10 @@ public class Application extends AbstractVersionedEntity {
     private boolean feePaid;
     @Column(name = "receipt_reference")
     private String receiptRef;
+    @Column(name = "location_description")
+    private String locationDescription;
+    @Column(name = "purpose")
+    private String purpose;
     @ExternalEJB(ejbLocalClass = PartyEJBLocal.class,
             loadMethod = "getParty", saveMethod = "saveParty")
     @ChildEntity(childIdField = "contactPersonId")
@@ -279,6 +283,22 @@ public class Application extends AbstractVersionedEntity {
     public void setReceiptRef(String receiptRef) {
         this.receiptRef = receiptRef;
     }
+
+    public String getLocationDescription() {
+        return locationDescription;
+    }
+
+    public void setLocationDescription(String locationDescription) {
+        this.locationDescription = locationDescription;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    } 
 
     public Party getAgent() {
         return agent;

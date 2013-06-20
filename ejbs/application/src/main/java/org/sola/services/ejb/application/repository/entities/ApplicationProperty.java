@@ -34,6 +34,7 @@
 package org.sola.services.ejb.application.repository.entities;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -68,7 +69,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private String baUnitId;
     @Column(name = "land_use_code")
     private String landUseCode;
-    
     // SOLA Tonga extensions
     @Column(name = "lease_number")
     private String leaseNumber;
@@ -78,12 +78,14 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private BigDecimal leaseArea;
     @Column(name = "amount")
     private BigDecimal amount;
+    @Column(name = "registration_date")
+    private Date registrationDate;
     @Column(name = "lessor_name")
     private String lessorName;
     @Column(name = "district")
     private String district;
     @Column(name = "noble_estate")
-    private String nobelEstate;
+    private String nobleEstate;
     @Column(name = "description")
     private String description;
 
@@ -204,6 +206,14 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.amount = amount;
     }
 
+    public Date getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
     public String getLessorName() {
         return lessorName;
     }
@@ -220,12 +230,12 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.district = district;
     }
 
-    public String getNobelEstate() {
-        return nobelEstate;
+    public String getNobleEstate() {
+        return nobleEstate;
     }
 
-    public void setNobelEstate(String nobelEstate) {
-        this.nobelEstate = nobelEstate;
+    public void setNobleEstate(String nobleEstate) {
+        this.nobleEstate = nobleEstate;
     }
 
     public String getDescription() {
