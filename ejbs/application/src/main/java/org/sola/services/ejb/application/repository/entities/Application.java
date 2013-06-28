@@ -106,6 +106,8 @@ public class Application extends AbstractVersionedEntity {
     private String locationDescription;
     @Column(name = "purpose")
     private String purpose;
+    @Column(name = "item_number")
+    private String itemNumber;
     @ExternalEJB(ejbLocalClass = PartyEJBLocal.class,
             loadMethod = "getParty", saveMethod = "saveParty")
     @ChildEntity(childIdField = "contactPersonId")
@@ -299,6 +301,14 @@ public class Application extends AbstractVersionedEntity {
     public void setPurpose(String purpose) {
         this.purpose = purpose;
     } 
+    
+    public String getItemNumber(){
+        return itemNumber;
+    }
+    
+    public void setItemNumber(String itemNumber){
+        this.itemNumber = itemNumber;
+    }
 
     public Party getAgent() {
         return agent;
