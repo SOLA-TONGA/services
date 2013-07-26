@@ -83,6 +83,10 @@ public class Service extends AbstractVersionedEntity {
     private Date actionDate;
     @Column(name = "action_completed")
     private boolean actionCompleted;
+    @Column(name = "approval_date")
+    private Date approvalDate;
+    @Column(name = "approval_number")
+    private String approvalNumber;
 
     public Service() {
         super();
@@ -207,6 +211,22 @@ public class Service extends AbstractVersionedEntity {
 
     public void setActionCompleted(boolean actionCompleted) {
         this.actionCompleted = actionCompleted;
+    }
+    
+    public Date getApprovalDate(){
+        return approvalDate;
+    }
+    
+    public void setApprovalDate(Date approvalDate){
+        this.approvalDate = approvalDate;
+    }
+    
+    public String getApprovalNumber(){
+        return approvalNumber;
+    }
+    
+    public void setApprovalNumber(String approvalNumber){
+        this.approvalNumber = approvalNumber;
     }
     
 }
