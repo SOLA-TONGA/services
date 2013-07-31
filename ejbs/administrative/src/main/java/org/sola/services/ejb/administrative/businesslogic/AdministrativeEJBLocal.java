@@ -179,4 +179,6 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
     
     List<SysRegProgress> getSysRegProgress(SysRegManagementParams params, String languageCode);
     
+    List<Estate> getEstates(String languageCode); 
+    
 }

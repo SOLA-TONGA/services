@@ -111,10 +111,10 @@ public class AdministrativeEJB extends AbstractEJB
      * values.
      */
     @Override
-    public List<LeaseCondition> getLeaseConditions(String languageCode){
+    public List<LeaseCondition> getLeaseConditions(String languageCode) {
         return getRepository().getCodeList(LeaseCondition.class, languageCode);
     }
-    
+
     /**
      * Retrieves all administrative.mortgage_type code values.
      *
@@ -207,8 +207,7 @@ public class AdministrativeEJB extends AbstractEJB
     /**
      * Saves any updates to an existing BA Unit. Can also be used to create a
      * new BA Unit, however this method does not set any default values on the
-     * BA Unit like
-     * {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
+     * BA Unit like null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
      * createBaUnit}. Will also create a new Transaction record for the BA Unit
      * if the Service is not already associated to a Transaction.
      *
@@ -423,7 +422,8 @@ public class AdministrativeEJB extends AbstractEJB
 
     /**
      * Reverses the cancellation / termination of a BA Unit by removing the BA
-     * Unit Target created by {@linkplain #terminateBaUnit(java.lang.String, java.lang.String) terminateBaUnit}.
+     * Unit Target created by
+     * {@linkplain #terminateBaUnit(java.lang.String, java.lang.String) terminateBaUnit}.
      * <p>Requires the {@linkplain RolesConstants#ADMINISTRATIVE_BA_UNIT_SAVE}
      * role.</p>
      *
@@ -483,8 +483,8 @@ public class AdministrativeEJB extends AbstractEJB
     }
 
     /**
-     * Creates a new BA Unit Area <p>Requires the {@linkplain RolesConstants#ADMINISTRATIVE_BA_UNIT_SAVE}
-     * role.</p>
+     * Creates a new BA Unit Area <p>Requires the
+     * {@linkplain RolesConstants#ADMINISTRATIVE_BA_UNIT_SAVE} role.</p>
      *
      * @param baUnitId The identifier of the area the BA Unit is being created
      * as part of
@@ -605,15 +605,15 @@ public class AdministrativeEJB extends AbstractEJB
             String params, String languageCode) {
         return this.validatePublicDisplay(params, languageCode);
     }
-    
-    
-     /**
-     * Returns list of systematic registration applications
-     * that matches the specified search string. This
-     * 
+
+    /**
+     * Returns list of systematic registration applications that matches the
+     * specified search string. This
+     *
      *
      * @param searchString The search string to use
-     * @return list of systematic registration applications matching the search string
+     * @return list of systematic registration applications matching the search
+     * string
      */
     @Override
     @RolesAllowed(RolesConstants.ADMINISTRATIVE_SYSTEMATIC_REGISTRATION)
@@ -630,6 +630,7 @@ public class AdministrativeEJB extends AbstractEJB
         result = getRepository().executeFunction(queryParams, SysRegManagement.class);
         return result;
     }
+
     @Override
     @RolesAllowed(RolesConstants.ADMINISTRATIVE_SYSTEMATIC_REGISTRATION)
     public List<SysRegStatus> getSysRegStatus(SysRegManagementParams params, String languageCode) {
@@ -645,7 +646,7 @@ public class AdministrativeEJB extends AbstractEJB
         result = getRepository().executeFunction(queryParams, SysRegStatus.class);
         return result;
     }
-    
+
     @Override
     @RolesAllowed(RolesConstants.ADMINISTRATIVE_SYSTEMATIC_REGISTRATION)
     public List<SysRegProgress> getSysRegProgress(SysRegManagementParams params, String languageCode) {
@@ -662,4 +663,20 @@ public class AdministrativeEJB extends AbstractEJB
         return result;
     }
 
+    /**
+     * Retrieves all administrative.ba_unit_rel_type code values.
+     *
+     * @param languageCode The language code to use for localization of display
+     * values.
+     * @return
+     */
+    @Override
+    public List<Estate> getEstates(String languageCode) {
+        List<Estate> result;
+        Map queryParams = new HashMap<String, Object>();
+        queryParams.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildGetEstatesSql());
+        queryParams.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, languageCode);
+        result = getRepository().getEntityList(Estate.class, queryParams);
+        return result;
+    }
 }
