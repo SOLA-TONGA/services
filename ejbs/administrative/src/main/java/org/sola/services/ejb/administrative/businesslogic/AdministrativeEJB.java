@@ -684,7 +684,7 @@ public class AdministrativeEJB extends AbstractEJB
     public List<District> getDistricts(String languageCode) {
         List<District> result;
         Map queryParams = new HashMap<String, Object>();
-        queryParams.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildGetEstatesSql());
+        queryParams.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildGetDistrictsSql());
         queryParams.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, languageCode);
         result = getRepository().getEntityList(District.class, queryParams);
         return result;

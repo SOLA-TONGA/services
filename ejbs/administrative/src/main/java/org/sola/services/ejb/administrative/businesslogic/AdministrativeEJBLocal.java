@@ -181,5 +181,5 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
     
     List<Estate> getEstates(String languageCode); 
     
-    List<Estate> getDistricts(String languageCode); 
+    List<District> getDistricts(String languageCode); 
 }
