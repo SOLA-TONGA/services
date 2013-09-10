@@ -70,7 +70,7 @@ public class AdminEJB extends AbstractEJB implements AdminEJBLocal {
      *
      * @param userName The user name of the user to search for.
      */
-    @RolesAllowed(RolesConstants.ADMIN_MANAGE_SECURITY)
+    @RolesAllowed({RolesConstants.ADMIN_MANAGE_SECURITY, RolesConstants.ADMIN_CHANGE_PASSWORD})
     @Override
     public User getUser(String userName) {
         Map params = new HashMap<String, Object>();
@@ -102,7 +102,7 @@ public class AdminEJB extends AbstractEJB implements AdminEJBLocal {
      * @param user The details of the user to save
      * @return The user details after the save is completed
      */
-    @RolesAllowed(RolesConstants.ADMIN_MANAGE_SECURITY)
+    @RolesAllowed({RolesConstants.ADMIN_MANAGE_SECURITY, RolesConstants.ADMIN_CHANGE_PASSWORD})
     @Override
     public User saveUser(User user) {
         return getRepository().saveEntity(user);
@@ -202,13 +202,14 @@ public class AdminEJB extends AbstractEJB implements AdminEJBLocal {
      * @param password The users new password
      * @return true if the change is successful.
      */
-    @RolesAllowed(RolesConstants.ADMIN_MANAGE_SECURITY)
+    @RolesAllowed({RolesConstants.ADMIN_MANAGE_SECURITY, RolesConstants.ADMIN_CHANGE_PASSWORD})
     @Override
     public boolean changePassword(String userName, String password) {
         Map params = new HashMap<String, Object>();
         params.put(CommonSqlProvider.PARAM_QUERY, User.QUERY_SET_PASSWORD);
         params.put(User.PARAM_PASSWORD, getPasswordHash(password));
         params.put(User.PARAM_USERNAME, userName);
+        params.put(User.PARAM_CHANGE_USER, this.getUserName());
 
         ArrayList<HashMap> list = getRepository().executeFunction(params);
 

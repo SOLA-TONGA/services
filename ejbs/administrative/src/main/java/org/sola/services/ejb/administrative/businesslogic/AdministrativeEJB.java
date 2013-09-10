@@ -207,7 +207,7 @@ public class AdministrativeEJB extends AbstractEJB
     /**
      * Saves any updates to an existing BA Unit. Can also be used to create a
      * new BA Unit, however this method does not set any default values on the
-     * BA Unit like null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
+     * BA Unit like  {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
      * createBaUnit}. Will also create a new Transaction record for the BA Unit
      * if the Service is not already associated to a Transaction.
      *
@@ -265,10 +265,16 @@ public class AdministrativeEJB extends AbstractEJB
      * @return A list of validation results.
      */
     @Override
+    @RolesAllowed({RolesConstants.APPLICATION_APPROVE, RolesConstants.APPLICATION_SERVICE_COMPLETE,
+        RolesConstants.APPLICATION_VALIDATE})
     public List<ValidationResult> approveTransaction(
             String transactionId, String approvedStatus,
             boolean validateOnly, String languageCode) {
         List<ValidationResult> validationResult = new ArrayList<ValidationResult>();
+
+        if (!this.isInRole(RolesConstants.APPLICATION_APPROVE)) {
+            validateOnly = true;
+        }
 
         //Change the status of BA Units that are involved in a transaction directly
         Map<String, Object> params = new HashMap<String, Object>();

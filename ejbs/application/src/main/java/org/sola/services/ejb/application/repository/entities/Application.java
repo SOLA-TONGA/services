@@ -48,6 +48,8 @@ import org.sola.services.common.repository.ChildEntityList;
 import org.sola.services.common.repository.ExternalEJB;
 import org.sola.services.common.repository.RepositoryUtility;
 import org.sola.services.common.repository.entities.AbstractVersionedEntity;
+import org.sola.services.ejb.cadastre.businesslogic.CadastreEJBLocal;
+import org.sola.services.ejb.cadastre.repository.entities.CadastreObject;
 import org.sola.services.ejb.party.businesslogic.PartyEJBLocal;
 import org.sola.services.ejb.party.repository.entities.Party;
 import org.sola.services.ejb.source.businesslogic.SourceEJBLocal;
@@ -124,7 +126,11 @@ public class Application extends AbstractVersionedEntity {
     @ChildEntityList(parentIdField = "applicationId", childIdField = "sourceId",
             manyToManyClass = ApplicationUsesSource.class)
     private List<Source> sourceList;
-
+    @ExternalEJB(ejbLocalClass = CadastreEJBLocal.class, loadMethod = "getCadastreObjects")
+    @ChildEntityList(parentIdField = "applicationId", childIdField = "spatialUnitId",
+    manyToManyClass = ApplicationSpatialUnit.class)
+    private List<CadastreObject> cadastreObjectList;
+    
     public Application() {
         super();
     }
@@ -357,6 +363,14 @@ public class Application extends AbstractVersionedEntity {
 
     public void setSourceList(List<Source> sourceList) {
         this.sourceList = sourceList;
+    }
+
+    public List<CadastreObject> getCadastreObjectList() {
+        return cadastreObjectList;
+    }
+
+    public void setCadastreObjectList(List<CadastreObject> cadastreObjectList) {
+        this.cadastreObjectList = cadastreObjectList;
     }
 
     @Override

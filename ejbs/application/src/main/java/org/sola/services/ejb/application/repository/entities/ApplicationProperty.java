@@ -93,14 +93,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         super();
     }
 
-    public String getLandUseCode() {
-        return landUseCode;
-    }
-
-    public void setLandUseCode(String landUseCode) {
-        this.landUseCode = landUseCode;
-    }
-
     public String getId() {
         id = id == null ? generateId() : id;
         return id;

@@ -25,59 +25,51 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
-package org.sola.services.ejb.application.repository.entities;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.sola.services.ejb.search.repository.entities;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import org.sola.services.common.repository.AccessFunctions;
 import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 
 /**
  *
- * @author RizzoM
+ * @author Elton Manoku
  */
-public class LodgementTiming extends AbstractReadOnlyEntity {
+@Table(name = "crs", schema = "system")
+public class Crs extends AbstractReadOnlyEntity {
 
-    public static final String PARAMETER_FROM = "fromDate";
-    public static final String PARAMETER_TO = "toDate";
-    public static final String QUERY_GETLODGEMENT = "select * from application.getlodgetiming(#{" + 
-            PARAMETER_FROM + "}, #{" + PARAMETER_TO + "}) "
-            + "  as TimingReport(resultCode varchar, resultTotal integer, resultDailyAvg float, ord integer) ";
+    public static String ORDER_COLUMN = "item_order";
+    @Id
+    @Column
+    private int srid;
+    @AccessFunctions(onSelect = "(select srtext from public.spatial_ref_sys where srid = crs.srid)")
+    @Column(name = "wkt")
+    private String wkt;
 
-    @Column(name="resultCode")
-    private String  resultCode;
-    @Column(name="resultTotal")
-    private Integer resultTotal;
-    @Column(name="resultDailyAvg")
-    private double resultDailyAvg;
-    
-    public LodgementTiming() {
+    public Crs() {
         super();
     }
 
-    public double getResultDailyAvg() {
-        return resultDailyAvg;
+    public int getSrid() {
+        return srid;
     }
 
-    public void setResultDailyAvg(double resultDailyAvg) {
-        this.resultDailyAvg = resultDailyAvg;
+    public void setSrid(int srid) {
+        this.srid = srid;
     }
 
-    public Integer getResultTotal() {
-        return resultTotal;
+    public String getWkt() {
+        return wkt;
     }
 
-    public void setResultTotal(Integer resultTotal) {
-        this.resultTotal = resultTotal;
+    public void setWkt(String wkt) {
+        this.wkt = wkt;
     }
 
-    
-    public String getResultCode() {
-        return resultCode;
-    }
-
-    public void setResultCode(String resultCode) {
-        this.resultCode = resultCode;
-    }
-    
 }

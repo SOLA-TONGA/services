@@ -29,14 +29,23 @@
  */
 package org.sola.services.ejb.cadastre.businesslogic;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.sola.common.RolesConstants;
+import org.sola.common.SOLAException;
+import org.sola.common.messaging.ServiceMessage;
+import org.sola.services.common.br.ValidationResult;
 import org.sola.services.common.ejbs.AbstractEJB;
+import org.sola.services.common.faults.SOLAValidationException;
 import org.sola.services.common.repository.CommonSqlProvider;
 import org.sola.services.ejb.cadastre.repository.entities.*;
+import org.sola.services.ejb.system.businesslogic.SystemEJBLocal;
+import org.sola.services.ejb.system.repository.entities.BrValidation;
 
 /**
  * EJB to manage data in the cadastre schema. Supports retrieving and saving of
@@ -46,6 +55,9 @@ import org.sola.services.ejb.cadastre.repository.entities.*;
 @Stateless
 @EJB(name = "java:global/SOLA/CadastreEJBLocal", beanInterface = CadastreEJBLocal.class)
 public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
+
+    @EJB
+    private SystemEJBLocal systemEJB;
 
     /**
      * Retrieves all cadastre.land_use_type code values.
@@ -105,7 +117,7 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
         searchString = searchString.replaceAll("\\\\|\\/", " ");
         params.put("search_string", searchString);
         params.put(CommonSqlProvider.PARAM_LIMIT_PART, numberOfMaxRecordsReturned);
-        params.put(CommonSqlProvider.PARAM_ORDER_BY_PART, CadastreObject.QUERY_ORDER_BY_SEARCHBYPARTS); 
+        params.put(CommonSqlProvider.PARAM_ORDER_BY_PART, CadastreObject.QUERY_ORDER_BY_SEARCHBYPARTS);
         return getRepository().getEntityList(CadastreObject.class,
                 CadastreObject.QUERY_WHERE_SEARCHBYPARTS, params);
     }
@@ -125,7 +137,7 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
         HashMap params = new HashMap();
         params.put("search_string", searchString);
         params.put(CommonSqlProvider.PARAM_LIMIT_PART, numberOfMaxRecordsReturned);
-        params.put(CommonSqlProvider.PARAM_ORDER_BY_PART, CadastreObject.QUERY_ORDER_BY_SEARCHBYPARTS); 
+        params.put(CommonSqlProvider.PARAM_ORDER_BY_PART, CadastreObject.QUERY_ORDER_BY_SEARCHBYPARTS);
         return getRepository().getEntityList(CadastreObject.class,
                 CadastreObject.QUERY_WHERE_SEARCHBYALLPARTS, params);
     }
@@ -199,14 +211,22 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
      * @param transactionId Identifier of the transaction associated to the
      * cadastre objects to be updated
      * @param filter The where clause to use when retrieving the cadastre
-     * objects. Must be {@linkplain CadastreObjectStatusChanger#QUERY_WHERE_SEARCHBYTRANSACTION_PENDING}
-     * or {@linkplain CadastreObjectStatusChanger#QUERY_WHERE_SEARCHBYTRANSACTION_TARGET}.
+     * objects. Must be
+     * {@linkplain CadastreObjectStatusChanger#QUERY_WHERE_SEARCHBYTRANSACTION_PENDING}
+     * or
+     * {@linkplain CadastreObjectStatusChanger#QUERY_WHERE_SEARCHBYTRANSACTION_TARGET}.
      * @param statusCode The status code to set on the selected cadastre
      * objects.
      */
     @Override
+    @RolesAllowed({RolesConstants.APPLICATION_APPROVE, RolesConstants.APPLICATION_SERVICE_COMPLETE})
     public void ChangeStatusOfCadastreObjects(
             String transactionId, String filter, String statusCode) {
+        if (!this.isInRole(RolesConstants.CADASTRE_PARCEL_SAVE)) {
+            // Along with one of the above 2 roles, the user must also have the Save Parcel role 
+            // to run this method. 
+            throw new SOLAException(ServiceMessage.EXCEPTION_INSUFFICIENT_RIGHTS);
+        }
         HashMap params = new HashMap();
         params.put("transaction_id", transactionId);
         List<CadastreObjectStatusChanger> involvedCoList =
@@ -270,9 +290,10 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
     /**
      * Retrieves all node points from the underlying cadastre objects that
      * intersect the specified bounding box coordinates. All of the node points
-     * within the bounding box are used to create a single geometry - {@linkplain CadastreObjectNode#geom}.
-     * The cadastre objects used as the source of the node points are also
-     * captured in the {@linkplain CadastreObjectNode#cadastreObjectList}.
+     * within the bounding box are used to create a single geometry -
+     * {@linkplain CadastreObjectNode#geom}. The cadastre objects used as the
+     * source of the node points are also captured in the
+     * {@linkplain CadastreObjectNode#cadastreObjectList}.
      *
      * @param xMin The xMin ordinate of the bounding box
      * @param yMin The yMin ordinate of the bounding box
@@ -306,6 +327,7 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
             params.clear();
             params.put("geom", cadastreObjectNode.getGeom());
             params.put("type_code", cadastreObjectType);
+            params.put("srid", srid);
             cadastreObjectNode.setCadastreObjectList(getRepository().getEntityList(
                     CadastreObject.class, CadastreObject.QUERY_WHERE_SEARCHBYGEOM, params));
         }
@@ -343,6 +365,7 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
             params.clear();
             params.put("geom", cadastreObjectNode.getGeom());
             params.put("type_code", cadastreObjectType);
+            params.put("srid", srid);
             cadastreObjectNode.setCadastreObjectList(getRepository().getEntityList(
                     CadastreObject.class, CadastreObject.QUERY_WHERE_SEARCHBYGEOM, params));
         }
@@ -392,9 +415,17 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
      * @param transactionId The identifier of the transaction
      */
     @Override
+    @RolesAllowed({RolesConstants.APPLICATION_APPROVE, RolesConstants.APPLICATION_SERVICE_COMPLETE})
     public void approveCadastreRedefinition(String transactionId) {
         List<CadastreObjectTargetRedefinition> targetObjectList =
                 this.getCadastreObjectRedefinitionTargetsByTransaction(transactionId);
+
+        if (!this.isInRole(RolesConstants.CADASTRE_PARCEL_SAVE)) {
+            // Along with one of the above 2 roles, the user must also have the Save Parcel role 
+            // to run this method. 
+            throw new SOLAException(ServiceMessage.EXCEPTION_INSUFFICIENT_RIGHTS);
+        }
+        
         for (CadastreObjectTargetRedefinition targetObject : targetObjectList) {
             CadastreObjectStatusChanger cadastreObject =
                     this.getRepository().getEntity(CadastreObjectStatusChanger.class,
@@ -421,13 +452,13 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
         params.put("transaction_id", transactionId);
         return getRepository().getEntityList(SpatialUnitTemporary.class, params);
     }
-    
-     /**
+
+    /**
      * Locates cadastre object's area size
      *
      *
-     * 
-     * @param colist the list of cadastre object 
+     *
+     * @param colist the list of cadastre object
      * @return The total area size
      */
     @Override
@@ -438,4 +469,91 @@ public class CadastreEJB extends AbstractEJB implements CadastreEJBLocal {
         return getRepository().getEntity(SpatialValueArea.class, params);
     }
 
+    @Override
+    public NewCadastreObjectIdentifier getNewCadastreObjectIdentifier(
+            byte[] geom, String cadastreObjectType) {
+        String brToGetLastPart = "generate-cadastre-object-lastpart";
+        String brToGetFirstPart = "generate-cadastre-object-firstpart";
+        HashMap<String, Serializable> params = new HashMap<String, Serializable>();
+        params.put("geom", geom);
+        params.put("cadastre_object_type", cadastreObjectType);
+        String lastPart = systemEJB.checkRuleGetResultSingle(brToGetLastPart, params).getValue().toString();
+        params = new HashMap<String, Serializable>();
+        params.put("last_part", lastPart);
+        params.put("cadastre_object_type", cadastreObjectType);
+        String firstPart = systemEJB.checkRuleGetResultSingle(brToGetFirstPart, null).getValue().toString();
+        NewCadastreObjectIdentifier identifier = new NewCadastreObjectIdentifier();
+        identifier.setFirstPart(firstPart);
+        identifier.setLastPart(lastPart);
+        return identifier;
+    }
+
+    /**
+     * Saves the changes in the spatial unit group.
+     *
+     * @param items
+     * @param languageCode
+     */
+    @Override
+    public void saveSpatialUnitGroups(List<SpatialUnitGroup> items, String languageCode) {
+        if (items.isEmpty()) {
+            return;
+        }
+        for (SpatialUnitGroup item : items) {
+            getRepository().saveEntity(item);
+        }
+        //Check afterwards if any condition is brokken by using the BR mechanism
+        //Retrieve BRs that has to be checked
+        List<BrValidation> brList = systemEJB.getBrForSpatialUnitGroupTransaction();
+        List<ValidationResult> validationResults =
+                systemEJB.checkRulesGetValidation(brList, languageCode, null);
+
+        if (!systemEJB.validationSucceeded(validationResults)) {
+            throw new SOLAValidationException(validationResults);
+        }
+
+    }
+
+    /**
+     * Gets the list of spatial unit groups that intersect with the
+     * filteringGeometry.
+     *
+     * @param filteringGeometry The filtering geometry
+     * @param hierarchyLevel The hierarchy level of the data
+     * @param srid The srid
+     * @return
+     */
+    @Override
+    public List<SpatialUnitGroup> getSpatialUnitGroups(
+            byte[] filteringGeometry, Integer hierarchyLevel, Integer srid) {
+        HashMap<String, Serializable> params = new HashMap<String, Serializable>();
+        params.put("filtering_geometry", filteringGeometry);
+        params.put("srid", srid);
+        params.put("hierarchy_level", hierarchyLevel);
+
+        return getRepository().getEntityList(
+                SpatialUnitGroup.class, SpatialUnitGroup.WHERE_CONDITION, params);
+    }
+
+    /**
+     * Retrieves a list of spatial unit groups matching the list of ids
+     * provided.
+     *
+     * @param ids A list of spatial unit group ids to use for retrieval.
+     */
+    @Override
+    public List<SpatialUnitGroup> getSpatialUnitGroupsByIds(List<String> ids) {
+        return getRepository().getEntityListByIds(SpatialUnitGroup.class, ids);
+    }
+
+    /**
+     * Retrieves all cadastre.cadastre_object_type code values.
+     *
+     * @param languageCode The language code to use for localization of display
+     * values.
+     */
+    @Override
+    public List<HierarchyLevel> getHierarchyLevels(String languageCode) {
+        return getRepository().getCodeList(HierarchyLevel.class, languageCode);
+    }
 }

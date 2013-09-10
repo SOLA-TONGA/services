@@ -1058,7 +1058,7 @@ public class CommonRepositoryImpl implements CommonRepository {
 
     private <T extends AbstractReadOnlyEntity, U extends CommonMapper> T getEntity(Class<T> entityClass,
             Map params, U mapper) {
-        boolean removeLanguageCode = false;
+
         HashMap<String, Object> result = null;
         T entity = null;
         params.put(CommonSqlProvider.PARAM_ENTITY_CLASS, entityClass);
@@ -1067,19 +1067,17 @@ public class CommonRepositoryImpl implements CommonRepository {
                 && !params.containsKey(CommonSqlProvider.PARAM_LANGUAGE_CODE)) {
             params.put(CommonSqlProvider.PARAM_LANGUAGE_CODE,
                     LocalInfo.get(CommonSqlProvider.PARAM_LANGUAGE_CODE));
-            removeLanguageCode = true;
+
         } else if (params.containsKey(CommonSqlProvider.PARAM_LANGUAGE_CODE)) {
             LocalInfo.set(CommonSqlProvider.PARAM_LANGUAGE_CODE,
-                    params.get(CommonSqlProvider.PARAM_LANGUAGE_CODE));
+                    params.get(CommonSqlProvider.PARAM_LANGUAGE_CODE), true);
         }
         result = mapper.getEntity(params);
         entity = mapToEntity(entityClass, result);
         if (entity != null) {
             loadChildren(entity, mapper);
         }
-        if (removeLanguageCode) {
-            LocalInfo.set(CommonSqlProvider.PARAM_LANGUAGE_CODE, null, true);
-        }
+
         return entity;
     }
 
@@ -1142,7 +1140,6 @@ public class CommonRepositoryImpl implements CommonRepository {
     private <T extends AbstractReadOnlyEntity, U extends CommonMapper> List<T> getEntityList(Class<T> entityClass,
             Map params, U mapper) {
 
-        boolean removeLanguageCode = false;
         List<T> entityList = null;
         ArrayList<HashMap> resultList = null;
         params.put(CommonSqlProvider.PARAM_ENTITY_CLASS, entityClass);
@@ -1151,10 +1148,10 @@ public class CommonRepositoryImpl implements CommonRepository {
                 && !params.containsKey(CommonSqlProvider.PARAM_LANGUAGE_CODE)) {
             params.put(CommonSqlProvider.PARAM_LANGUAGE_CODE,
                     LocalInfo.get(CommonSqlProvider.PARAM_LANGUAGE_CODE));
-            removeLanguageCode = true;
+
         } else if (params.containsKey(CommonSqlProvider.PARAM_LANGUAGE_CODE)) {
             LocalInfo.set(CommonSqlProvider.PARAM_LANGUAGE_CODE,
-                    params.get(CommonSqlProvider.PARAM_LANGUAGE_CODE));
+                    params.get(CommonSqlProvider.PARAM_LANGUAGE_CODE), true);
         }
         resultList = mapper.getEntityList(params);
         entityList = mapToEntityList(entityClass, resultList);
@@ -1163,9 +1160,7 @@ public class CommonRepositoryImpl implements CommonRepository {
                 loadChildren(entity, mapper);
             }
         }
-        if (removeLanguageCode) {
-            LocalInfo.set(CommonSqlProvider.PARAM_LANGUAGE_CODE, null, true);
-        }
+
         return entityList;
     }
 

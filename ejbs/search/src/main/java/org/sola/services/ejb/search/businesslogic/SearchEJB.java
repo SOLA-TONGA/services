@@ -402,7 +402,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      * sorted by lodgement date DESC.
      */
     @Override
-    @RolesAllowed(RolesConstants.APPLICATION_VIEW_APPS)
+    @RolesAllowed(RolesConstants.DASHBOARD_VIEW_UNASSIGNED_APPS)
     public List<ApplicationSearchResult> getUnassignedApplications(String locale) {
 
         Map params = new HashMap<String, Object>();
@@ -432,7 +432,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      * sorted by lodgement date DESC.
      */
     @Override
-    @RolesAllowed(RolesConstants.APPLICATION_VIEW_APPS)
+    @RolesAllowed(RolesConstants.DASHBOARD_VIEW_ASSIGNED_APPS)
     public List<ApplicationSearchResult> getAssignedApplications(String locale) {
         Map params = new HashMap<String, Object>();
         params.put(CommonSqlProvider.PARAM_FROM_PART, ApplicationSearchResult.QUERY_FROM);
@@ -561,6 +561,16 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         return getRepository().getEntityList(ConfigMapLayer.class, params);
     }
 
+    /**
+     * Returns the list of Crs
+     * @return 
+     */
+    @Override
+    public List<Crs> getCrsList(){
+        Map params = new HashMap<String, Object>();
+        params.put(CommonSqlProvider.PARAM_ORDER_BY_PART, Crs.ORDER_COLUMN);
+        return getRepository().getEntityList(Crs.class, params);
+    }
     /**
      * Executes a group of dynamic spatial queries using a filtering geometry.
      * Primarily used to obtain results for the Object Information Tool. Each
@@ -694,7 +704,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      * @return A maximum of 100 BA Units matching the search criteria.
      */
     @Override
-    @RolesAllowed(RolesConstants.ADMINISTRATIVE_BA_UNIT_SEARCH)
+    @RolesAllowed({RolesConstants.ADMINISTRATIVE_BA_UNIT_SEARCH, RolesConstants.APPLICATION_EDIT_APPS,
+    RolesConstants.APPLICATION_CREATE_APPS})
     public List<BaUnitSearchResult> searchBaUnits(BaUnitSearchParams searchParams) {
         Map params = new HashMap<String, Object>();
 
@@ -742,9 +753,10 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      */
     @Override
     public List<SpatialSearchResult> searchSpatialObjects(String queryName,
-            String searchString) {
+            String searchString, int srid) {
         Map params = new HashMap<String, Object>();
         params.put(SpatialSearchResult.PARAM_SEARCH_STRING, searchString);
+        params.put(SpatialSearchResult.PARAM_SRID, srid);
         return executeDynamicQuery(SpatialSearchResult.class, queryName, params);
     }
 
@@ -802,7 +814,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(paramLastPart, nameLastPart);
         List result = getRepository().executeSql(params);
         byte[] value = null;
-        if (result.size()>0){
+        if (result != null && result.size()>0 && result.get(0) != null){
             value = (byte[]) ((HashMap)result.get(0)).get("extent");
         }
         return value;

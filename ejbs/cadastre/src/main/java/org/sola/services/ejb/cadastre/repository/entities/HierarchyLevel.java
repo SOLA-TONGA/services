@@ -25,41 +25,21 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
-package org.sola.services.ejb.application.repository.entities;
+package org.sola.services.ejb.cadastre.repository.entities;
+
+import javax.persistence.Table;
+import org.sola.services.common.repository.DefaultSorter;
+import org.sola.services.common.repository.entities.AbstractCodeEntity;
 
 /**
- *
- * @author RizzoM
+ * Entity representing cadastre.hierarchy_level code table.
+ * @author soladev
  */
+@Table(name = "hierarchy_level",  schema = "cadastre")
+@DefaultSorter(sortString="display_value")
+public class HierarchyLevel extends AbstractCodeEntity {
 
-import java.util.Date;
-import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
-
-public class LodgementViewParams extends AbstractReadOnlyEntity {
-    private Date fromDate;
-    private Date toDate;
-    
-    public LodgementViewParams(){
+    public HierarchyLevel() {
+        super();
     }
-    
-    
-    
-    public Date getFromDate() {
-        return fromDate;
-    }
-
-    public void setFromDate(Date fromDate) {
-        this.fromDate = fromDate;
-    }
-
-    
-    public Date getToDate() {
-        return toDate;
-    }
-
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
-    }
-    
 }
-
