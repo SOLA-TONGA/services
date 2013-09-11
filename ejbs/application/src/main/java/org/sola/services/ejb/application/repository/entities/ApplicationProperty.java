@@ -166,6 +166,14 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.verifiedLocation = verifiedLocation;
     }
 
+    public String getLandUseCode() {
+        return landUseCode;
+    }
+
+    public void setLandUseCode(String landUseCode) {
+        this.landUseCode = landUseCode;
+    }
+
     public String getLeaseNumber() {
         return leaseNumber;
     }
