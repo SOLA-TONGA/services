@@ -35,6 +35,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.sola.common.RolesConstants;
 import org.sola.common.SOLAException;
+import org.sola.common.StringUtility;
 import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.ejbs.AbstractEJB;
 import org.sola.services.common.repository.CommonSqlProvider;
@@ -71,9 +72,9 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      * Retrieves the SQL for the dynamic query from the system.query table
      *
      * @param queryName The name of the dynamic query to retrieve
-     * @param params The parameters to use for the dynamic query. If the {@linkplain CommonSqlProvider#PARAM_LANGUAGE_CODE}
-     * param is supplied, this value is used to localize the display values for
-     * the dynamic query.
+     * @param params The parameters to use for the dynamic query. If the
+     * {@linkplain CommonSqlProvider#PARAM_LANGUAGE_CODE} param is supplied,
+     * this value is used to localize the display values for the dynamic query.
      * @throws SOLAException If the dynamic query name does not match any query
      * in the database
      */
@@ -210,25 +211,60 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
     /**
      * Determines if the property details provided already exist in the SOLA
      * database or not. Can be used to help determine if the property being
-     * added to a new application is valid or not.
+     * added to a new application is valid or not. Customized for Tonga.
      *
      * @param applicationNumber The number of the application the property is
      * being added/associated to. Used to exclude the current application from
      * the test and avoid a false positive match.
-     * @param firstPart The first part of the property name.
-     * @param lastPart The last part of the property name.
+     * @param firstPart The first part (i.e. Deed #) of the allotment.
+     * @param lastPart The last part (i.e. Folio) of the allotment.
+     * @param leaseNumber The lease number for the lease. Can be provided as an
+     * alternative to the allotment details.
      */
     @Override
-    public PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart) {
+    public PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart, String leaseNumber) {
+
+        if ((StringUtility.isEmpty(firstPart) || StringUtility.isEmpty(lastPart))
+                && StringUtility.isEmpty(leaseNumber)) {
+            // No valid parameters to use for check. 
+            return null;
+        }
+
         if (applicationNumber == null) {
             applicationNumber = "";
         }
+
         Map params = new HashMap<String, Object>();
-        params.put(CommonSqlProvider.PARAM_QUERY, PropertyVerifier.QUERY_VERIFY_SQL);
+        params.put(CommonSqlProvider.PARAM_QUERY,
+                SearchSqlProvider.buildAllotmentVerifierSql(firstPart, lastPart, leaseNumber));
         params.put(PropertyVerifier.QUERY_PARAM_APPLICATION_NUMBER, applicationNumber);
         params.put(PropertyVerifier.QUERY_PARAM_FIRST_PART, firstPart);
         params.put(PropertyVerifier.QUERY_PARAM_LAST_PART, lastPart);
-        return getRepository().getEntity(PropertyVerifier.class, params);
+        params.put(PropertyVerifier.QUERY_PARAM_LEASE_NUM, leaseNumber);
+        // Validate the allotment details
+        AllotmentVerifier lot = getRepository().getEntity(AllotmentVerifier.class, params);
+
+        LeaseVerifier lease = null;
+        if (!StringUtility.isEmpty(leaseNumber)) {
+            params.remove(CommonSqlProvider.PARAM_QUERY);
+            params.put(CommonSqlProvider.PARAM_QUERY,
+                    SearchSqlProvider.buildLeaseVerifierSql(leaseNumber));
+            // Validate the lease details
+            lease = getRepository().getEntity(LeaseVerifier.class, params);
+        }
+
+        params.remove(CommonSqlProvider.PARAM_QUERY);
+        params.put(CommonSqlProvider.PARAM_QUERY,
+                SearchSqlProvider.buildApplicationVerifierSql(applicationNumber,
+                firstPart, lastPart, leaseNumber));
+        // Check if there are any applications using this allotment/lease info. 
+        String apps = getRepository().getScalar(String.class, params);
+
+        PropertyVerifier result = null;
+        if (lot != null || lease != null || apps != null) {
+            result = new PropertyVerifier(lease, lot, apps);
+        }
+        return result;
     }
 
     /**
@@ -419,9 +455,9 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      * Returns applications that have a lodged or approved status and are
      * assigned to the currently logged in user.
      *
-     * <p>If the currently logged in user has the {@linkplain RolesConstants#APPLICATION_UNASSIGN_FROM_OTHERS}
-     * then all lodged or approved applications assigned to any user are
-     * returned. </p>
+     * <p>If the currently logged in user has the
+     * {@linkplain RolesConstants#APPLICATION_UNASSIGN_FROM_OTHERS} then all
+     * lodged or approved applications assigned to any user are returned. </p>
      *
      * <p>Requires the {@linkplain RolesConstants#APPLICATION_VIEW_APPS}
      * role.</p>
@@ -522,7 +558,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put("name_lastpart", spatialQuery.getNameLastPart());
         return getSpatialResultForNavigation(spatialQuery.getQueryName(), params);
     }
-    
+
     private Map getSpatialNavigationQueryParams(QueryForNavigation spatialQuery) {
         Map params = new HashMap<String, Object>();
         params.put("minx", spatialQuery.getWest());
@@ -533,9 +569,9 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put("pixel_res", spatialQuery.getPixelResolution());
         return params;
     }
-    
+
     private ResultForNavigationInfo getSpatialResultForNavigation(
-            String queryName, Map params){
+            String queryName, Map params) {
         ResultForNavigationInfo spatialResultInfo = new ResultForNavigationInfo();
         getRepository().setLoadInhibitors(new Class[]{DynamicQueryField.class});
         List<SpatialResult> result = executeDynamicQuery(SpatialResult.class,
@@ -543,7 +579,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         getRepository().clearLoadInhibitors();
         spatialResultInfo.setToAdd(result);
         return spatialResultInfo;
-        
+
     }
 
     /**
@@ -563,14 +599,16 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
     /**
      * Returns the list of Crs
-     * @return 
+     *
+     * @return
      */
     @Override
-    public List<Crs> getCrsList(){
+    public List<Crs> getCrsList() {
         Map params = new HashMap<String, Object>();
         params.put(CommonSqlProvider.PARAM_ORDER_BY_PART, Crs.ORDER_COLUMN);
         return getRepository().getEntityList(Crs.class, params);
     }
+
     /**
      * Executes a group of dynamic spatial queries using a filtering geometry.
      * Primarily used to obtain results for the Object Information Tool. Each
@@ -637,8 +675,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
     /**
      * Retrieves the history of changes and actions that have been applied to
-     * the application. <p>Requires the {@linkplain RolesConstants#APPLICATION_VIEW_APPS}
-     * role.</p>
+     * the application. <p>Requires the
+     * {@linkplain RolesConstants#APPLICATION_VIEW_APPS} role.</p>
      *
      * @param applicationId The application to retrieve the log for
      */
@@ -654,8 +692,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
     /**
      * Executes a search across all Business Rules. Partial matches of the br
-     * display name are supported. <p>Requires the {@linkplain RolesConstants#ADMIN_MANAGE_BR}
-     * role.</p>
+     * display name are supported. <p>Requires the
+     * {@linkplain RolesConstants#ADMIN_MANAGE_BR} role.</p>
      *
      * @param searchParams The parameters to use for the search.
      * @param lang The language code to use for localization of display values
@@ -705,7 +743,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      */
     @Override
     @RolesAllowed({RolesConstants.ADMINISTRATIVE_BA_UNIT_SEARCH, RolesConstants.APPLICATION_EDIT_APPS,
-    RolesConstants.APPLICATION_CREATE_APPS})
+        RolesConstants.APPLICATION_CREATE_APPS})
     public List<BaUnitSearchResult> searchBaUnits(BaUnitSearchParams searchParams) {
         Map params = new HashMap<String, Object>();
 
@@ -768,7 +806,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
     public List<RightsExportResult> searchRightsForExport(RightsExportParams searchParams) {
         Map params = new HashMap<String, Object>();
         Calendar cal = Calendar.getInstance();
-        
+
         if (searchParams.getDateFrom() == null) {
             searchParams.setDateFrom(new GregorianCalendar(1, 1, 1, 0, 0).getTime());
         } else {
@@ -786,7 +824,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
             cal.set(Calendar.MINUTE, 59);
             searchParams.setDateTo(cal.getTime());
         }
-        
+
         if (searchParams.getRightTypeCode() == null) {
             searchParams.setRightTypeCode("");
         }
@@ -799,9 +837,9 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
     /**
      * Get the extent of the public display map.
-     * 
+     *
      * @param nameLastPart
-     * @return 
+     * @return
      */
     @Override
     public byte[] getExtentOfPublicDisplayMap(String nameLastPart) {
@@ -814,9 +852,9 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(paramLastPart, nameLastPart);
         List result = getRepository().executeSql(params);
         byte[] value = null;
-        if (result != null && result.size()>0 && result.get(0) != null){
-            value = (byte[]) ((HashMap)result.get(0)).get("extent");
+        if (result != null && result.size() > 0 && result.get(0) != null) {
+            value = (byte[]) ((HashMap) result.get(0)).get("extent");
         }
         return value;
-    }    
+    }
 }

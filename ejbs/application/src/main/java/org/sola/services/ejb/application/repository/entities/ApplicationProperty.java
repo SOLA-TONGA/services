@@ -82,12 +82,20 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private Date registrationDate;
     @Column(name = "lessor_name")
     private String lessorName;
-    @Column(name = "district")
-    private String district;
-    @Column(name = "noble_estate")
-    private String nobleEstate;
+    @Column(name = "island_id")
+    private String islandId;
+    @Column(name = "noble_estate_id")
+    private String nobleEstateId;
     @Column(name = "description")
     private String description;
+    @Column(name = "town_id")
+    private String townId;
+    @Column(name = "lessee_name")
+    private String lesseeName;
+    @Column(name = "lease_linked")
+    private boolean leaseLinked;
+    @Column(name = "lease_ba_unit_id")
+    private String leaseBaUnitId;
 
     public ApplicationProperty() {
         super();
@@ -222,22 +230,29 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.lessorName = lessorName;
     }
 
-    public String getDistrict() {
-        return district;
+    public String getIslandId() {
+        return islandId;
     }
 
-    public void setDistrict(String district) {
-        this.district = district;
+    public void setIslandId(String islandId) {
+        this.islandId = islandId;
     }
 
-    public String getNobleEstate() {
-        return nobleEstate;
+    public String getNobleEstateId() {
+        return nobleEstateId;
     }
 
-    public void setNobleEstate(String nobleEstate) {
-        this.nobleEstate = nobleEstate;
+    public void setNobleEstateId(String nobleEstateId) {
+        this.nobleEstateId = nobleEstateId;
     }
 
+    public String getTownId() {
+        return townId;
+    }
+
+    public void setTownId(String townId) {
+        this.townId = townId;
+    }
     public String getDescription() {
         return description;
     }
@@ -245,4 +260,30 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getLesseeName() {
+        return lesseeName;
+    }
+
+    public void setLesseeName(String lesseeName) {
+        this.lesseeName = lesseeName;
+    }
+
+    public boolean isLeaseLinked() {
+        return leaseLinked;
+    }
+
+    public void setLeaseLinked(boolean leaseLinked) {
+        this.leaseLinked = leaseLinked;
+    }
+
+    public String getLeaseBaUnitId() {
+        return leaseBaUnitId;
+    }
+
+    public void setLeaseBaUnitId(String leaseBaUnitId) {
+        this.leaseBaUnitId = leaseBaUnitId;
+    }
+    
+    
 }

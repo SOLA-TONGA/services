@@ -47,7 +47,7 @@ public interface SearchEJBLocal extends AbstractEJBLocal {
      * See {@linkplain SearchEJB#getPropertyVerifier(java.lang.String, java.lang.String, java.lang.String)
      * SearchEJB.getPropertyVerifier}.
      */
-    PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart);
+    PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart, String leaseNumber);
 
     /**
      * See {@linkplain SearchEJB#getGenericResultList(java.lang.String, java.util.Map)

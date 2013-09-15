@@ -1,26 +1,30 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2012 - Food and Agriculture Organization of the United Nations (FAO). All rights
- * reserved.
+ * Copyright (C) 2012 - Food and Agriculture Organization of the United Nations
+ * (FAO). All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,this list of conditions
- * and the following disclaimer. 2. Redistributions in binary form must reproduce the above
- * copyright notice,this list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution. 3. Neither the name of FAO nor the names of its
- * contributors may be used to endorse or promote products derived from this software without
- * specific prior written permission.
+ * 1. Redistributions of source code must retain the above copyright notice,this
+ * list of conditions and the following disclaimer. 2. Redistributions in binary
+ * form must reproduce the above copyright notice,this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution. 3. Neither the name of FAO nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT,STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
- * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT,STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
 /*
@@ -29,8 +33,11 @@
  */
 package org.sola.services.ejb.search.repository;
 
+import org.apache.ibatis.jdbc.SqlBuilder;
 import static org.apache.ibatis.jdbc.SqlBuilder.*;
+import org.sola.common.StringUtility;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchResult;
+import org.sola.services.ejb.search.repository.entities.PropertyVerifier;
 
 /**
  *
@@ -46,7 +53,6 @@ public class SearchSqlProvider {
     private static final String SOURCE_GROUP = "Source";
     private static final String AGENT_GROUP = "Agent";
     private static final String CONTACT_PERSON_GROUP = "Contact person";
-    
     private static final String CHANGE_ACTION = "changed";
     private static final String ADDED_PROPERTY = "ADDED PROPERTY: ";
     private static final String DELETED_PROPERTY = "DELETED PROPERTY: ";
@@ -57,7 +63,6 @@ public class SearchSqlProvider {
     private static final String ADDED_CONTACT_PERSON = "ADDED CONTACT PERSON: ";
     private static final String DELETED_CONTACT_PERSON = "REMOVED CONTACT PERSON: ";
 
-    
     public static String buildApplicationLogSql() {
         String sql;
         int sortClassifier = 1;
@@ -182,7 +187,7 @@ public class SearchSqlProvider {
 //        WHERE("ser.application_id = #{" + PARAM_APPLICATION_ID + "}");
 //        WHERE("tran.from_service_id = ser.id");
 //        WHERE("rrr.transaction_id = tran.id");
-         
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
@@ -203,8 +208,8 @@ public class SearchSqlProvider {
                 + " AS user_fullname");
         FROM("application.application_property prop1 ");
         WHERE("prop1.application_id = #{" + PARAM_APPLICATION_ID + "}");
-        
-         sql = sql + SQL() + " UNION ";
+
+        sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
         // Application property History
@@ -226,12 +231,12 @@ public class SearchSqlProvider {
                 + " AS user_fullname");
         FROM("application.application_property_historic prop_hist");
         WHERE("prop_hist.application_id = #{" + PARAM_APPLICATION_ID + "}");
-        
-        
+
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
-         // SOURCE
+        // SOURCE
         BEGIN();
         SELECT("'" + SOURCE_GROUP + "' AS record_group");
         SELECT("'" + SOURCE_GROUP + "' AS record_type");
@@ -250,7 +255,7 @@ public class SearchSqlProvider {
                 + " LEFT JOIN source.source source "
                 + " ON source1.source_id = source.id ");
         WHERE("source1.application_id = #{" + PARAM_APPLICATION_ID + "}");
-        
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
@@ -275,14 +280,14 @@ public class SearchSqlProvider {
                 + " LEFT JOIN source.source source "
                 + " ON source1.source_id = source.id ");
         WHERE("source1.application_id = #{" + PARAM_APPLICATION_ID + "}");
-       
-        
+
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
         // AGENT 
         BEGIN();
-        
+
         SELECT("'" + AGENT_GROUP + "' AS record_group");
         SELECT("'" + AGENT_GROUP + "' AS record_type");
         SELECT(sortClassifier + " as sort_classifier");
@@ -300,13 +305,13 @@ public class SearchSqlProvider {
         FROM("party.party party");
         WHERE("app.id = #{" + PARAM_APPLICATION_ID + "}");
         WHERE("app.agent_id=party.id");
-        
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
         // AGENT History
         BEGIN();
-        
+
         SELECT("'" + AGENT_GROUP + "' AS record_group");
         SELECT("'" + AGENT_GROUP + "' AS record_type");
         SELECT(sortClassifier + " as sort_classifier");
@@ -314,8 +319,8 @@ public class SearchSqlProvider {
         SELECT("app.rowversion AS record_sequence");
         SELECT("''::text AS nr");
         SELECT("CASE WHEN (app.change_action='i') then replace(party.change_action,'i','" + ADDED_AGENT + "')||' - '||coalesce(party.name,'')||' '||coalesce(party.last_name,'')"
-        + " ELSE  replace(app.change_action,app.change_action,'" + DELETED_AGENT + "')||' - '||coalesce(party.name,'')||' '||coalesce(party.last_name,'')"
-        + " END AS action_code");
+                + " ELSE  replace(app.change_action,app.change_action,'" + DELETED_AGENT + "')||' - '||coalesce(party.name,'')||' '||coalesce(party.last_name,'')"
+                + " END AS action_code");
         SELECT("NULL::text AS notation");
         SELECT("app.change_time");
         SELECT("(SELECT (appuser.first_name::text || ' '::text) || appuser.last_name::text"
@@ -323,21 +328,21 @@ public class SearchSqlProvider {
                 + " WHERE appuser.username::text = app.change_user::text)"
                 + " AS user_fullname");
         FROM("application.application new_app");
-        FROM("application.application_historic app"  
-                + " LEFT JOIN party.party party" 
-                + "  ON app.agent_id = party.id"); 
+        FROM("application.application_historic app"
+                + " LEFT JOIN party.party party"
+                + "  ON app.agent_id = party.id");
         WHERE("app.id = #{" + PARAM_APPLICATION_ID + "}");
         WHERE("app.agent_id != new_app.agent_id");
         WHERE("app.agent_id=party.id");
         WHERE("((app.rowversion - 1) = new_app.rowversion OR (app.rowversion) = new_app.rowversion)");
-       
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
-        
+
         // contact_person 
         BEGIN();
-        
+
         SELECT("'" + CONTACT_PERSON_GROUP + "' AS record_group");
         SELECT("'" + CONTACT_PERSON_GROUP + "' AS record_type");
         SELECT(sortClassifier + " as sort_classifier");
@@ -355,22 +360,22 @@ public class SearchSqlProvider {
         FROM("party.party party");
         WHERE("app.id = #{" + PARAM_APPLICATION_ID + "}");
         WHERE("app.contact_person_id=party.id");
-        
+
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
         // contact_person History
         BEGIN();
-        
+
         SELECT("'" + CONTACT_PERSON_GROUP + "' AS record_group");
         SELECT("'" + CONTACT_PERSON_GROUP + "' AS record_type");
         SELECT(sortClassifier + " as sort_classifier");
         SELECT("app.contact_person_id AS record_id");
         SELECT("app.rowversion AS record_sequence");
-        SELECT("''::text AS nr"); 
+        SELECT("''::text AS nr");
         SELECT("CASE WHEN (app.change_action='i') then replace(party.change_action,'i','" + ADDED_CONTACT_PERSON + "')||' - '||coalesce(party.name,'')||' '||coalesce(party.last_name,'')"
-        + " ELSE  replace(app.change_action,app.change_action,'" + DELETED_CONTACT_PERSON + "')||' - '||coalesce(party.name,'')||' '||coalesce(party.last_name,'')"
-        + " END AS action_code");
+                + " ELSE  replace(app.change_action,app.change_action,'" + DELETED_CONTACT_PERSON + "')||' - '||coalesce(party.name,'')||' '||coalesce(party.last_name,'')"
+                + " END AS action_code");
         SELECT("NULL::text AS notation");
         SELECT("app.change_time");
         SELECT("(SELECT (appuser.first_name::text || ' '::text) || appuser.last_name::text"
@@ -378,14 +383,14 @@ public class SearchSqlProvider {
                 + " WHERE appuser.username::text = app.change_user::text)"
                 + " AS user_fullname");
         FROM("application.application new_app");
-        FROM("application.application_historic app"  
-                + " LEFT JOIN party.party_historic party" 
-                + "  ON app.contact_person_id = party.id"); 
+        FROM("application.application_historic app"
+                + " LEFT JOIN party.party_historic party"
+                + "  ON app.contact_person_id = party.id");
         WHERE("app.id = #{" + PARAM_APPLICATION_ID + "}");
         WHERE("app.contact_person_id != new_app.contact_person_id");
         WHERE("app.contact_person_id=party.id");
         WHERE("((app.rowversion - 1) = new_app.rowversion OR (app.rowversion) = new_app.rowversion)");
-       
+
         ORDER_BY("change_time, sort_classifier, nr");
 
         sql = sql + SQL();
@@ -394,9 +399,9 @@ public class SearchSqlProvider {
     }
 
     /**
-     * Uses the BA Unit Search parameters to build an appropriate SQL Query. This method does not
-     * inject the search parameter values into the SQL as that would prevent the database from
-     * performing statement caching.
+     * Uses the BA Unit Search parameters to build an appropriate SQL Query.
+     * This method does not inject the search parameter values into the SQL as
+     * that would prevent the database from performing statement caching.
      *
      * @param nameFirstPart The name first part search parameter value
      * @param nameLastPart The name last part search parameter value
@@ -439,6 +444,166 @@ public class SearchSqlProvider {
                     + "}, COALESCE(prop.name_lastpart, ''))");
         }
         ORDER_BY(BaUnitSearchResult.QUERY_ORDER_BY + " LIMIT 100");
+        sql = SQL();
+        return sql;
+    }
+
+    /**
+     * Builds a SQL string to retrieve property information. Used to verify if
+     * the allotment details entered for a new application match details in the
+     * database. Customization for Tonga.
+     *
+     * @param appNumber The number for the new application the property details
+     * will be associated with.
+     * @param nameFirstPart The deed number of the allotment
+     * @param nameLastPart The folio of the allotment
+     * @param leaseNumber The lease number for the lease
+     */
+    public static String buildAllotmentVerifierSql(String nameFirstPart,
+            String nameLastPart, String leaseNumber) {
+        String sql;
+
+        // Retrieve details about the allotment
+        BEGIN();
+        SELECT("b.id AS lot_id");
+        SELECT("b.name_firstpart AS deed_num");
+        SELECT("b.name_lastpart AS folio");
+        SELECT("(SELECT string_agg(TRIM(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')), ', ') "
+                + "FROM administrative.rrr r, administrative.party_for_rrr pfr, party.party p "
+                + "WHERE r.ba_unit_id = b.id "
+                + "AND r.status_code = 'current' "
+                + "AND r.type_code = 'ownership' "
+                + "AND pfr.rrr_id = r.id "
+                + "AND p.id = pfr.party_id ) AS holder_name");
+        SELECT("(SELECT ba.size "
+                + "FROM administrative.ba_unit_area ba "
+                + "WHERE ba.ba_unit_id = b.id "
+                + "AND ba.type_code = 'officialArea') AS lot_area");
+        SELECT("b.creation_date AS reg_date");
+        SELECT("(SELECT co.land_use_code "
+                + "FROM cadastre.cadastre_object co, "
+                + "     administrative.ba_unit_contains_spatial_unit bas "
+                + "WHERE co.id = bas.spatial_unit_id "
+                + "AND bas.ba_unit_id = b.id "
+                + "AND co.status_code = 'current') AS land_use_code");
+        SELECT("(SELECT island.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  town, "
+                + "     administrative.required_relationship_baunit island "
+                + "WHERE town.to_ba_unit_id = b.id "
+                + "AND town.relation_code = 'town' "
+                + "AND island.to_ba_unit_id = town.from_ba_unit_id "
+                + "AND island.relation_code = 'island') AS island_id");
+        SELECT("(SELECT ba_rel.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  ba_rel "
+                + "WHERE ba_rel.to_ba_unit_id = b.id "
+                + "AND ba_rel.relation_code = 'town') AS town_id");
+        FROM("administrative.ba_unit b");
+        WHERE("b.status_code = 'current'");
+        WHERE("b.type_code IN ('townAllotmentUnit', 'taxUnit') ");
+
+        if (!StringUtility.isEmpty(nameFirstPart) && !StringUtility.isEmpty(nameLastPart)) {
+            if (!StringUtility.isEmpty(leaseNumber)) {
+                // Check if the lease is linked to the allotment
+                SELECT("COALESCE((SELECT (lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}) "
+                        + "FROM administrative.required_relationship_baunit lease_rel,"
+                        + "     administrative.ba_unit lease "
+                        + "WHERE lease_rel.from_ba_unit_id = b.id "
+                        + "AND lease_rel.relation_code = 'allotment' "
+                        + "AND lease.id = lease_rel.to_ba_unit_id "
+                        + "AND lease.type_code = 'leasedUnit' "
+                        + "AND lease.status_code = 'current'), false) AS lease_linked");
+            }
+            // Use the deed number and folio for the criteria
+            WHERE("b.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} ");
+            WHERE("b.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "} ");
+        } else if (!StringUtility.isEmpty(leaseNumber)) {
+            // Use the lease number if the deed number and folio are not provided. 
+            SELECT("true AS lease_linked");
+            FROM("administrative.ba_unit lease ");
+            FROM("administrative.required_relationship_baunit rel");
+            WHERE("lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+            WHERE("lease.type_code = 'leasedUnit'");
+            WHERE("lease.status_code = 'current'");
+            WHERE("rel.to_ba_unit_id = lease.id");
+            WHERE("rel.relation_code = 'allotment'");
+            WHERE("b.id = rel.from_ba_unit_id");
+        }
+        sql = SQL();
+        return sql;
+    }
+
+    /**
+     * Builds a SQL string to retrieve property information. Used to verify if
+     * the lease details entered for a new application match details in the
+     * database. Customization for Tonga.
+     *
+     * @param leaseNumber The lease number for the lease
+     */
+    public static String buildLeaseVerifierSql(String leaseNumber) {
+        String sql;
+
+        // Retrieve details about the lease
+        BEGIN();
+        SELECT("b.id AS lease_id");
+        SELECT("b.name_firstpart AS lease_num");
+        SELECT("(SELECT string_agg(TRIM(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')), ', ') "
+                + "FROM administrative.party_for_rrr pfr, party.party p "
+                + "WHERE pfr.rrr_id = r.id "
+                + "AND p.id = pfr.party_id ) AS lessee_name");
+        SELECT("(SELECT ba.size "
+                + "FROM administrative.ba_unit_area ba "
+                + "WHERE ba.ba_unit_id = b.id "
+                + "AND ba.type_code = 'officialArea') AS lease_area");
+        SELECT("r.term AS term");
+        SELECT("r.amount AS rental");
+        FROM("administrative.ba_unit b");
+        FROM("administrative.rrr r");
+        WHERE("b.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+        WHERE("b.type_code = 'leasedUnit'");
+        WHERE("b.status_code = 'current'");
+        WHERE("r.ba_unit_id = b.id");
+        WHERE("r.status_code = 'current'");
+        WHERE("r.type_code = 'lease'");
+        sql = SQL();
+
+        return sql;
+    }
+
+    /**
+     * Builds a SQL string to check if any other applications link to the
+     * allotment and/or lease used by the specified application. Customization
+     * for Tonga.
+     *
+     * @param appNumber The number for the new application the property details
+     * will be associated with.
+     * @param nameFirstPart The deed number of the allotment
+     * @param nameLastPart The folio of the allotment
+     * @param leaseNumber The lease number for the lease
+     */
+    public static String buildApplicationVerifierSql(String appNumber, String nameFirstPart,
+            String nameLastPart, String leaseNumber) {
+        String sql;
+
+        // Check if there are any pending applications on this lease or allotment
+        BEGIN();
+        SELECT("string_agg(nr, ',') AS applications_where_found");
+        FROM("application.application a");
+        FROM("application.application_property ap");
+        WHERE("ap.application_id = a.id");
+        WHERE("a.status_code = 'lodged'");
+        WHERE("a.nr != #{" + PropertyVerifier.QUERY_PARAM_APPLICATION_NUMBER + "}");
+        if (!StringUtility.isEmpty(nameFirstPart) && !StringUtility.isEmpty(nameLastPart)) {
+            if (!StringUtility.isEmpty(leaseNumber)) {
+                WHERE("((ap.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} "
+                        + "AND ap.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "}) "
+                        + "OR (ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}))");
+            } else {
+                WHERE("ap.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} "
+                        + "AND ap.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "} ");
+            }
+        } else if (!StringUtility.isEmpty(leaseNumber)) {
+            WHERE("ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+        }
         sql = SQL();
         return sql;
     }

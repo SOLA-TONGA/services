@@ -27,36 +27,76 @@
  * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.sola.services.ejb.administrative.repository.entities;
+package org.sola.services.ejb.search.repository.entities;
 
-import java.util.Date;
+import java.math.BigDecimal;
 import javax.persistence.Column;
-import javax.persistence.Table;
-import org.sola.services.common.repository.entities.AbstractStatusChangerEntity;
+import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 
-/**
- *
- * @author soladev
- */
-@Table(name = "notation", schema = "administrative")
-public class BaUnitNotationStatusChanger extends AbstractStatusChangerEntity {
+public class LeaseVerifier extends AbstractReadOnlyEntity {
 
-    @Column(name = "notation_date")
-    private Date notationDate;
+    @Column(name = "lease_id")
+    private String leaseBaUnitId;
+    @Column(name = "lease_num")
+    private String leaseNumber;
+    @Column(name = "lessee_name")
+    private String lesseeName;
+    @Column(name = "lease_area")
+    private BigDecimal leaseArea;
+    @Column(name = "rental")
+    private BigDecimal leaseRental;
+    @Column(name = "term")
+    private BigDecimal leaseTerm;
 
-    public BaUnitNotationStatusChanger() {
+    public LeaseVerifier() {
         super();
     }
 
-    public Date getNotationDate() {
-        return notationDate;
+    public String getLeaseBaUnitId() {
+        return leaseBaUnitId;
     }
 
-    public void setNotationDate(Date notationDate) {
-        this.notationDate = notationDate;
+    public void setLeaseBaUnitId(String leaseBaUnitId) {
+        this.leaseBaUnitId = leaseBaUnitId;
+    }
+
+    public String getLeaseNumber() {
+        return leaseNumber;
+    }
+
+    public void setLeaseNumber(String leaseNumber) {
+        this.leaseNumber = leaseNumber;
+    }
+
+    public String getLesseeName() {
+        return lesseeName;
+    }
+
+    public void setLesseeName(String lesseeName) {
+        this.lesseeName = lesseeName;
+    }
+
+    public BigDecimal getLeaseArea() {
+        return leaseArea;
+    }
+
+    public void setLeaseArea(BigDecimal leaseArea) {
+        this.leaseArea = leaseArea;
+    }
+
+    public BigDecimal getLeaseRental() {
+        return leaseRental;
+    }
+
+    public void setLeaseRental(BigDecimal leaseRental) {
+        this.leaseRental = leaseRental;
+    }
+
+    public BigDecimal getLeaseTerm() {
+        return leaseTerm;
+    }
+
+    public void setLeaseTerm(BigDecimal leaseTerm) {
+        this.leaseTerm = leaseTerm;
     }
 }

@@ -94,6 +94,10 @@ public class BaUnit extends AbstractVersionedEntity {
     private String statusCode;
     @Column(name = "transaction_id", updatable = false)
     private String transactionId;
+    @Column(name = "creation_date", updatable = false)
+    private String folioRegDate;
+    @Column(name = "expiration_date", updatable = false)
+    private String cancellationDate;
     @ChildEntityList(parentIdField = "baUnitId")
     private List<Rrr> rrrList;
     @ChildEntityList(parentIdField = "baUnitId")
@@ -205,6 +209,22 @@ public class BaUnit extends AbstractVersionedEntity {
         this.typeCode = typeCode;
     }
 
+    public String getFolioRegDate() {
+        return folioRegDate;
+    }
+
+    public void setFolioRegDate(String folioRegDate) {
+        this.folioRegDate = folioRegDate;
+    }
+
+    public String getCancellationDate() {
+        return cancellationDate;
+    }
+
+    public void setCancellationDate(String cancellationDate) {
+        this.cancellationDate = cancellationDate;
+    }
+
     public List<BaUnitNotation> getBaUnitNotationList() {
         return baUnitNotationList;
     }
@@ -293,10 +313,10 @@ public class BaUnit extends AbstractVersionedEntity {
         if (getNameFirstpart() == null || getNameFirstpart().trim().length() < 1
                 || getNameLastpart() == null || getNameLastpart().trim().length() < 1) {
             // The user must specify the name for the ba unit (Lease or Allotment)
-            throw new SOLAException(ServiceMessage.EJB_ADMINISTRATIVE_DEED_NUM_REQUIRED); 
+            throw new SOLAException(ServiceMessage.EJB_ADMINISTRATIVE_DEED_NUM_REQUIRED);
         }
         if (getName() == null || getName().trim().equals("")) {
-            setName(getNameFirstpart() + "/" + getNameLastpart()); 
+            setName(getNameFirstpart() + "/" + getNameLastpart());
         }
 
         // Set the reference id on the source so that it is possible to 

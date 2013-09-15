@@ -227,7 +227,7 @@ public class SearchEJBIT extends AbstractEJBTest {
         SearchEJBLocal instance = (SearchEJBLocal) getEJBInstance(SearchEJB.class.getSimpleName());
         String firstPart = "602";
         String lastPart = "6629";
-        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart);
+        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null);
         if (result != null) {
             System.out.println("ba unit found: " + result.toString());
         } else {
@@ -247,7 +247,7 @@ public class SearchEJBIT extends AbstractEJBTest {
         SearchEJBLocal instance = (SearchEJBLocal) getEJBInstance(SearchEJB.class.getSimpleName());
         String firstPart = null;
         String lastPart = "6629";
-        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart);
+        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null);
         if (result != null) {
             System.out.println("ba unit found: " + result.toString());
         } else {

@@ -34,6 +34,7 @@ import java.util.*;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import org.sola.common.DateUtility;
 import org.sola.common.RolesConstants;
 import org.sola.services.common.EntityAction;
 import org.sola.services.common.LocalInfo;
@@ -207,7 +208,7 @@ public class AdministrativeEJB extends AbstractEJB
     /**
      * Saves any updates to an existing BA Unit. Can also be used to create a
      * new BA Unit, however this method does not set any default values on the
-     * BA Unit like  {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
+     * BA Unit like null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
      * createBaUnit}. Will also create a new Transaction record for the BA Unit
      * if the Service is not already associated to a Transaction.
      *
@@ -283,12 +284,21 @@ public class AdministrativeEJB extends AbstractEJB
         params.put("username", getUserName());
         List<BaUnitStatusChanger> baUnitList =
                 getRepository().getEntityList(BaUnitStatusChanger.class, params);
-
+        Date approvalDate = DateUtility.now();
         for (BaUnitStatusChanger baUnit : baUnitList) {
             validationResult.addAll(this.validateBaUnit(baUnit, languageCode));
             if (systemEJB.validationSucceeded(validationResult) && !validateOnly) {
                 baUnit.setStatusCode(approvedStatus);
                 baUnit.setTransactionId(transactionId);
+                if (RegistrationStatusType.STATUS_CURRENT.equals(approvedStatus)
+                        && baUnit.getFolioRegDate() == null) {
+                    // Set the registration date for the property. 
+                    baUnit.setFolioRegDate(approvalDate);
+                } else if (RegistrationStatusType.STATUS_HISTORIC.equals(approvedStatus)
+                        && baUnit.getCancellationDate() == null) {
+                    // Set the cancellation date for the property. 
+                    baUnit.setCancellationDate(approvalDate);
+                }
                 getRepository().saveEntity(baUnit);
             }
         }
@@ -303,6 +313,15 @@ public class AdministrativeEJB extends AbstractEJB
             validationResult.addAll(this.validateRrr(rrr, languageCode));
             if (systemEJB.validationSucceeded(validationResult) && !validateOnly) {
                 rrr.setStatusCode(approvedStatus);
+                if (RegistrationStatusType.STATUS_CURRENT.equals(approvedStatus)
+                        && rrr.getRegistrationDate() == null) {
+                    // Set the registration date for the rrr. 
+                    rrr.setRegistrationDate(approvalDate);
+                } else if (RegistrationStatusType.STATUS_HISTORIC.equals(approvedStatus)
+                        && rrr.getExpirationDate() == null) {
+                    // Set the cancellation date for the rrr. 
+                    rrr.setExpirationDate(approvalDate);
+                }
                 getRepository().saveEntity(rrr);
             }
         }
@@ -317,6 +336,9 @@ public class AdministrativeEJB extends AbstractEJB
                     getRepository().getEntityList(BaUnitNotationStatusChanger.class, params);
             for (BaUnitNotationStatusChanger baUnitNotation : baUnitNotationList) {
                 baUnitNotation.setStatusCode(RegistrationStatusType.STATUS_CURRENT);
+                if (baUnitNotation.getNotationDate() == null) {
+                    baUnitNotation.setNotationDate(approvalDate);
+                }
                 getRepository().saveEntity(baUnitNotation);
             }
         }
@@ -685,7 +707,7 @@ public class AdministrativeEJB extends AbstractEJB
         result = getRepository().getEntityList(Estate.class, queryParams);
         return result;
     }
-    
+
     @Override
     public List<District> getDistricts(String languageCode) {
         List<District> result;
