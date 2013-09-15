@@ -79,4 +79,21 @@ public class AdministrativeSqlProvider {
         sql = SqlBuilder.SQL();
         return sql;
     }
+    
+    public static String buildGetTownsSql() {
+        String sql;
+        BEGIN();
+        SELECT("DISTINCT ba.id AS code");
+        SELECT("ba.name_firstpart AS display_value");
+        SELECT("NULL AS description");
+        SELECT("CASE WHEN ba.status_code = 'current' THEN 'c' ELSE 'x' END AS status");
+        SELECT("ba_rel.from_ba_unit_id AS island_id");
+        FROM("administrative.ba_unit ba "
+                + " LEFT OUTER JOIN administrative.required_relationship_baunit ba_rel "
+                + " ON ba_rel.to_ba_unit_id = ba.id AND ba_rel.relation_code = 'island'");
+        WHERE("ba.type_code = 'townUnit'");
+        ORDER_BY("ba.name_firstpart");
+        sql = SqlBuilder.SQL();
+        return sql;
+    }
 }
