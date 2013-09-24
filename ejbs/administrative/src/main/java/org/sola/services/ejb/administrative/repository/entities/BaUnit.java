@@ -30,7 +30,7 @@
 package org.sola.services.ejb.administrative.repository.entities;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -95,7 +95,7 @@ public class BaUnit extends AbstractVersionedEntity {
     @Column(name = "transaction_id", updatable = false)
     private String transactionId;
     @Column(name = "creation_date", updatable = false)
-    private String folioRegDate;
+    private Date folioRegDate;
     @Column(name = "expiration_date", updatable = false)
     private String cancellationDate;
     @ChildEntityList(parentIdField = "baUnitId")
@@ -209,11 +209,11 @@ public class BaUnit extends AbstractVersionedEntity {
         this.typeCode = typeCode;
     }
 
-    public String getFolioRegDate() {
+    public Date getFolioRegDate() {
         return folioRegDate;
     }
 
-    public void setFolioRegDate(String folioRegDate) {
+    public void setFolioRegDate(Date folioRegDate) {
         this.folioRegDate = folioRegDate;
     }
 
