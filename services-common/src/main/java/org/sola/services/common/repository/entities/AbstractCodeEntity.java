@@ -52,7 +52,7 @@ public abstract class AbstractCodeEntity extends AbstractEntity {
     private String description;
     @Column(name = "status")
     private String status;
-
+  
     public AbstractCodeEntity() {
         super();
     }
