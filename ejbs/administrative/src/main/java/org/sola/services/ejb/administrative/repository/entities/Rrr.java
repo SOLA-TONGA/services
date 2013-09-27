@@ -96,6 +96,16 @@ public class Rrr extends AbstractVersionedEntity {
     private Integer mortgageRanking;
     @Column(name = "mortgage_type_code")
     private String mortgageTypeCode;
+    @Column(name = "book_ref")
+    private String bookReference;
+    @Column(name = "page_ref")
+    private String pageReference;
+    @Column
+    private BigDecimal term;
+    @Column(name = "receipt_date")
+    private Date receiptDate;
+    @Column(name = "receipt_reference")
+    private String receiptReference;
     // Child entity fields
     @ChildEntity(insertBeforeParent = false, parentIdField = "rrrId")
     private BaUnitNotation notation;
@@ -270,6 +280,46 @@ public class Rrr extends AbstractVersionedEntity {
 
     public void setTypeCode(String typeCode) {
         this.typeCode = typeCode;
+    }
+
+    public String getBookReference() {
+        return bookReference;
+    }
+
+    public void setBookReference(String bookReference) {
+        this.bookReference = bookReference;
+    }
+
+    public String getPageReference() {
+        return pageReference;
+    }
+
+    public void setPageReference(String pageReference) {
+        this.pageReference = pageReference;
+    }
+
+    public BigDecimal getTerm() {
+        return term;
+    }
+
+    public void setTerm(BigDecimal term) {
+        this.term = term;
+    }
+
+    public Date getReceiptDate() {
+        return receiptDate;
+    }
+
+    public void setReceiptDate(Date receiptDate) {
+        this.receiptDate = receiptDate;
+    }
+
+    public String getReceiptReference() {
+        return receiptReference;
+    }
+
+    public void setReceiptReference(String receiptReference) {
+        this.receiptReference = receiptReference;
     }
 
     public BaUnitNotation getNotation() {

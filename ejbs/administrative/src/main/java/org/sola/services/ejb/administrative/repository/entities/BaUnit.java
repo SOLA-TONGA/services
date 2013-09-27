@@ -98,6 +98,12 @@ public class BaUnit extends AbstractVersionedEntity {
     private Date folioRegDate;
     @Column(name = "expiration_date", updatable = false)
     private String cancellationDate;
+    // Tonga customization
+    @Column(name = "registered_name")
+    private String registeredName;
+    // Tonga customization - add LandUseCode to ba_unit instead of CadastreOjbect 
+    @Column(name = "land_use_code")
+    private String landUseCode;
     @ChildEntityList(parentIdField = "baUnitId")
     private List<Rrr> rrrList;
     @ChildEntityList(parentIdField = "baUnitId")
@@ -223,6 +229,22 @@ public class BaUnit extends AbstractVersionedEntity {
 
     public void setCancellationDate(String cancellationDate) {
         this.cancellationDate = cancellationDate;
+    }
+
+    public String getRegisteredName() {
+        return registeredName;
+    }
+
+    public void setRegisteredName(String registeredName) {
+        this.registeredName = registeredName;
+    }
+
+    public String getLandUseCode() {
+        return landUseCode;
+    }
+
+    public void setLandUseCode(String landUseCode) {
+        this.landUseCode = landUseCode;
     }
 
     public List<BaUnitNotation> getBaUnitNotationList() {
