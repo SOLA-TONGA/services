@@ -36,10 +36,13 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import org.sola.common.DateUtility;
 import org.sola.common.RolesConstants;
+import org.sola.common.SOLAException;
+import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.EntityAction;
 import org.sola.services.common.LocalInfo;
 import org.sola.services.common.br.ValidationResult;
 import org.sola.services.common.ejbs.AbstractEJB;
+import org.sola.services.common.faults.FaultUtility;
 import org.sola.services.common.faults.SOLAValidationException;
 import org.sola.services.common.repository.CommonSqlProvider;
 import org.sola.services.ejb.administrative.repository.entities.*;
@@ -232,7 +235,18 @@ public class AdministrativeEJB extends AbstractEJB
         TransactionBasic transaction =
                 transactionEJB.getTransactionByServiceId(serviceId, true, TransactionBasic.class);
         LocalInfo.setTransactionId(transaction.getId());
-        return getRepository().saveEntity(baUnit);
+        BaUnit result = null;
+        try {
+            result = getRepository().saveEntity(baUnit);
+        } catch (RuntimeException e) {
+            if (FaultUtility.getStackTraceAsString(e).contains("ba_unit_unique_name_parts")) {
+                throw new SOLAException(ServiceMessage.EXCEPTION_BAUNIT_HAS_DUPLICATE_NAME,
+                        new String[]{baUnit.getName()}, e);
+            } else {
+                throw e;
+            }
+        }
+        return result;
     }
 
     /**

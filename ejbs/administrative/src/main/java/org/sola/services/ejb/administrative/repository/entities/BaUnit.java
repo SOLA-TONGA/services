@@ -108,6 +108,9 @@ public class BaUnit extends AbstractVersionedEntity {
     private List<Rrr> rrrList;
     @ChildEntityList(parentIdField = "baUnitId")
     private List<BaUnitNotation> baUnitNotationList;
+    // SOLA Tonga customization
+    @ChildEntityList(parentIdField = "baUnitId")
+    private List<BaUnitArea> baUnitAreaList;
     @ExternalEJB(ejbLocalClass = SourceEJBLocal.class,
             loadMethod = "getSources", saveMethod = "saveSource")
     @ChildEntityList(parentIdField = "baUnitId", childIdField = "sourceId",
@@ -126,8 +129,9 @@ public class BaUnit extends AbstractVersionedEntity {
     @Column(insertable = false, updatable = false, name = "pending_action_code")
     @AccessFunctions(onSelect = "administrative.get_ba_unit_pending_action(id)")
     private String pendingActionCode;
-    @Column(insertable = false, updatable = false, name = "calculated_area_size")
-    @AccessFunctions(onSelect = "administrative.get_calculated_area_size_action(#{" + QUERY_PARAMETER_COLIST + "})")
+    // Tonga Customization - calculated Area Size is not required. 
+    //@Column(insertable = false, updatable = false, name = "calculated_area_size")
+    //@AccessFunctions(onSelect = "administrative.get_calculated_area_size_action(#{" + QUERY_PARAMETER_COLIST + "})")
     private BigDecimal calculatedAreaSize;
 
     public BigDecimal getCalculatedAreaSize() {
@@ -303,6 +307,14 @@ public class BaUnit extends AbstractVersionedEntity {
         this.pendingActionCode = pendingActionCode;
     }
 
+    public List<BaUnitArea> getBaUnitAreaList() {
+        return baUnitAreaList;
+    }
+
+    public void setBaUnitAreaList(List<BaUnitArea> baUnitAreaList) {
+        this.baUnitAreaList = baUnitAreaList;
+    }
+
     public Boolean isLocked() {
         if (locked == null) {
             locked = false;
@@ -333,12 +345,17 @@ public class BaUnit extends AbstractVersionedEntity {
             setTransactionId(LocalInfo.getTransactionId());
         }
         if (getNameFirstpart() == null || getNameFirstpart().trim().length() < 1
-                || getNameLastpart() == null || getNameLastpart().trim().length() < 1) {
+                || getNameLastpart() == null || (getNameLastpart().trim().length() < 1
+                && isAllotment())) {
             // The user must specify the name for the ba unit (Lease or Allotment)
             throw new SOLAException(ServiceMessage.EJB_ADMINISTRATIVE_DEED_NUM_REQUIRED);
         }
         if (getName() == null || getName().trim().equals("")) {
-            setName(getNameFirstpart() + "/" + getNameLastpart());
+            if (isAllotment()) {
+                setName(getNameFirstpart() + "/" + getNameLastpart());
+            } else {
+                setName(getNameFirstpart());
+            }
         }
 
         // Set the reference id on the source so that it is possible to 
@@ -349,5 +366,42 @@ public class BaUnit extends AbstractVersionedEntity {
             }
         }
         super.preSave();
+    }
+
+    /**
+     * Returns true if the property is a Lease
+     */
+    public boolean isLease() {
+        return BaUnitType.CODE_LEASED_UNIT.equals(this.getTypeCode());
+    }
+
+    /**
+     * Returns true if the property is an Allotment (either Town or Tax
+     * allotment)
+     */
+    public boolean isAllotment() {
+        return BaUnitType.CODE_TOWN_ALLOTMENT_UNIT.equals(this.getTypeCode())
+                || BaUnitType.CODE_TAX_UNIT.equals(this.getTypeCode());
+    }
+
+    /**
+     * Returns true if the property is the estate of a Noble or the King
+     */
+    public boolean isEstate() {
+        return BaUnitType.CODE_ESTATE_UNIT.equals(this.getTypeCode());
+    }
+
+    /**
+     * Returns true if the property represents a Town
+     */
+    public boolean isTown() {
+        return BaUnitType.CODE_TOWN_UNIT.equals(this.getTypeCode());
+    }
+
+    /**
+     * Returns true if the property represents an island
+     */
+    public boolean isIsland() {
+        return BaUnitType.CODE_ISLAND_UNIT.equals(this.getTypeCode());
     }
 }
