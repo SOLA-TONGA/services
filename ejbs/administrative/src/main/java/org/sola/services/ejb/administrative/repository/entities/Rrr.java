@@ -96,10 +96,8 @@ public class Rrr extends AbstractVersionedEntity {
     private Integer mortgageRanking;
     @Column(name = "mortgage_type_code")
     private String mortgageTypeCode;
-    @Column(name = "book_ref")
-    private String bookReference;
-    @Column(name = "page_ref")
-    private String pageReference;
+    @Column(name = "registry_book_ref")
+    private String registryBookReference;
     @Column
     private BigDecimal term;
     @Column(name = "receipt_date")
@@ -282,20 +280,12 @@ public class Rrr extends AbstractVersionedEntity {
         this.typeCode = typeCode;
     }
 
-    public String getBookReference() {
-        return bookReference;
+    public String getRegistryBookReference() {
+        return registryBookReference;
     }
 
-    public void setBookReference(String bookReference) {
-        this.bookReference = bookReference;
-    }
-
-    public String getPageReference() {
-        return pageReference;
-    }
-
-    public void setPageReference(String pageReference) {
-        this.pageReference = pageReference;
+    public void setRegistryBookReference(String registryBookReference) {
+        this.registryBookReference = registryBookReference;
     }
 
     public BigDecimal getTerm() {
