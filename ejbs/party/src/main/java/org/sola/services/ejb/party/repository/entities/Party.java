@@ -55,6 +55,7 @@ public class Party extends AbstractVersionedEntity {
     public static final String TYPE_CODE_NATURAL_PERSON = "naturalPerson";
     public static final String QUERY_WHERE_BYTYPECODE = "type_code = #{partyTypeCode}";
     public static final String QUERY_WHERE_LODGING_AGENTS = "party.id in (select party_id from party.party_role where party.party_role.type_code = 'lodgingAgent')";
+    public static final String QUERY_NOBLES = "party.id in (select party_id from party.party_role where party.party_role.type_code = 'noble')";
     
     @Id
     @Column(name = "id")

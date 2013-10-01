@@ -89,4 +89,6 @@ public interface PartyEJBLocal extends AbstractEJBLocal {
      * PartyEJB.getAgents}.
      */
     List<Party> getAgents();
+    
+    List<Party> getNobles();
 }

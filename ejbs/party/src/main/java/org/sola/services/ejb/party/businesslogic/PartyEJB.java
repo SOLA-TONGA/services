@@ -172,4 +172,22 @@ public class PartyEJB extends AbstractEJB implements PartyEJBLocal {
     public List<PartyRoleType> getPartyRoles(String languageCode) {
         return getRepository().getCodeList(PartyRoleType.class, languageCode);
     }
+    
+        /**
+     * Returns all parties that have the lodgingAgent party role. Note that the address and party
+     * role details for each agent are not loaded. <p>No role is required to execute this
+     * method.</p>
+     */
+    @Override
+    public List<Party> getNobles() {
+        Map params = new HashMap<String, Object>();
+        params.put(CommonSqlProvider.PARAM_WHERE_PART, Party.QUERY_NOBLES);
+
+        // Don't load Address or PartyRole as these are not required for the agents list. 
+        getRepository().setLoadInhibitors(new Class<?>[]{PartyRole.class, Address.class});
+        List<Party> agents = getRepository().getEntityList(Party.class, params);
+        getRepository().clearLoadInhibitors();
+
+        return agents;
+    }
 }
