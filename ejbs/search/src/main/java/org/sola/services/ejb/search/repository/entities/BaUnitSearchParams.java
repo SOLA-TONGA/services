@@ -35,6 +35,10 @@ import org.sola.services.common.repository.entities.AbstractEntity;
 
 public class BaUnitSearchParams extends AbstractEntity {
 
+    public static final String SEARCH_TYPE_ALLOTMENT = "allotment";
+    public static final String SEARCH_TYPE_LEASE = "lease";
+    public static final String SEARCH_TYPE_ESTATE = "estate";
+    public static final String SEARCH_TYPE_TOWN = "town";
     private String nameFirstPart;
     private String nameLastPart;
     private String ownerName;
@@ -182,5 +186,14 @@ public class BaUnitSearchParams extends AbstractEntity {
                     : "\\s" + getRegistryPageRef();
         }
         return result;
+    }
+
+    /**
+     * Indicates if the search is of the specified type.
+     * @param searchType
+     * @return 
+     */
+    public boolean isSearchType(String searchType) {
+        return searchType.equals(getSearchType());
     }
 }

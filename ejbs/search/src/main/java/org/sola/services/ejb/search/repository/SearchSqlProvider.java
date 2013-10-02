@@ -406,44 +406,64 @@ public class SearchSqlProvider {
      * @param params Object containing the parameter values provided by the user
      * @return SQL String
      */
-    public static String buildSearchAllotmentSql(BaUnitSearchParams params) {
+    public static String buildSearchBaUnitSql(BaUnitSearchParams params) {
         String sql;
         BEGIN();
+
+        // Capture fields common for all searches
         SELECT("DISTINCT prop.id");
         SELECT("prop.name");
         SELECT("prop.name_firstpart");
         SELECT("prop.name_lastpart");
         SELECT("prop.status_code");
-        SELECT("(SELECT string_agg(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, ''), '::::') "
-                + "FROM administrative.rrr rrr1, administrative.party_for_rrr pr1, party.party p1 "
-                + "WHERE rrr1.ba_unit_id = prop.id "
-                + "AND rrr1.status_code = 'current' "
-                + "AND rrr1.is_primary = TRUE "
-                + "AND pr1.rrr_id = rrr1.id "
-                + "AND p1.id = pr1.party_id ) AS rightholders");
         SELECT("prop.registered_name");
         SELECT("prop.type_code");
-        SELECT("rrr.registry_book_ref");
-        SELECT("rrr.registration_date");
-        SELECT("(SELECT t1.name "
-                + "FROM administrative.ba_unit t1, "
-                + "     administrative.required_relationship_baunit req1 "
-                + "WHERE req1.to_ba_unit_id = prop.id "
-                + "AND req1.relation_code = 'town' "
-                + "AND t1.id = req1.from_ba_unit_id ) AS town_name");
+        if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)
+                || params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
+            // Retrieve the island details
+            SELECT("(SELECT string_agg(i1.name_firstpart, ',') "
+                    + "FROM administrative.ba_unit i1, "
+                    + "     administrative.required_relationship_baunit req1 "
+                    + "WHERE req1.to_ba_unit_id = prop.id "
+                    + "AND req1.relation_code = 'island' "
+                    + "AND i1.id = req1.from_ba_unit_id ) AS island_name");
+        } else {
+            // Retrieve the town details
+            SELECT("(SELECT string_agg(t1.name_firstpart, ',') "
+                    + "FROM administrative.ba_unit t1, "
+                    + "     administrative.required_relationship_baunit req1 "
+                    + "WHERE req1.to_ba_unit_id = prop.id "
+                    + "AND req1.relation_code = 'town' "
+                    + "AND t1.id = req1.from_ba_unit_id ) AS town_name");
+        }
         FROM("administrative.ba_unit prop");
-        FROM("administrative.rrr rrr");
-        WHERE("rrr.ba_unit_id = prop.id");
-        WHERE("rrr.status_code = 'current'");
-        WHERE("rrr.is_primary = TRUE");
 
-        if (params.getSearchType().equals("lease")) {
+        if (!params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
+            // Caputre fields required for all but town searches
+            SELECT("(SELECT string_agg(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, ''), ',') "
+                    + "FROM administrative.rrr rrr1, administrative.party_for_rrr pr1, party.party p1 "
+                    + "WHERE rrr1.ba_unit_id = prop.id "
+                    + "AND rrr1.status_code = 'current' "
+                    + "AND rrr1.is_primary = TRUE "
+                    + "AND pr1.rrr_id = rrr1.id "
+                    + "AND p1.id = pr1.party_id ) AS rightholders");
+            SELECT("rrr.registry_book_ref");
+            SELECT("rrr.registration_date");
+            FROM("administrative.rrr rrr");
+            WHERE("rrr.ba_unit_id = prop.id");
+            WHERE("rrr.status_code = 'current'");
+            WHERE("rrr.is_primary = TRUE");
+        }
+
+        if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_LEASE)) {
+            SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
             WHERE("prop.type_code = 'leasedUnit'");
-        } else if (params.getSearchType().equals("estate")) {
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
             WHERE("prop.type_code = 'estateUnit'");
-        } else if (params.getSearchType().equals("town")) {
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
             WHERE("prop.type_code IN ('townUnit', 'islandUnit')");
         } else {
+            // Allotment search
             if (params.isTaxAllotment() == params.isTownAllotment()) {
                 // Ensure there is always type_code criteria
                 WHERE("prop.type_code IN ('taxUnit', 'townAllotmentUnit')");
@@ -491,6 +511,11 @@ public class SearchSqlProvider {
             WHERE("rrr.registration_date <= #{" + BaUnitSearchResult.QUERY_PARAM_REGISTRATION_TO_DATE + "}");
         }
 
+        if (!StringUtility.isEmpty(params.getOtherRightholder())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_OTHER_RIGHTHOLDER
+                    + "}, COALESCE(administrative.get_other_rightholder_name(rrr.id), ''))");
+        }
+
         if (!StringUtility.isEmpty(params.getTownId())) {
             WHERE("EXISTS (SELECT req.from_ba_unit_id "
                     + "FROM administrative.required_relationship_baunit req "
@@ -499,6 +524,14 @@ public class SearchSqlProvider {
                     + "AND req.relation_code = 'town')");
         }
 
+        if (!StringUtility.isEmpty(params.getIslandId())
+                && params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
+            WHERE("EXISTS (SELECT req.from_ba_unit_id "
+                    + "FROM administrative.required_relationship_baunit req "
+                    + "WHERE req.to_ba_unit_id = prop.id "
+                    + "AND req.from_ba_unit_id = #{" + BaUnitSearchResult.QUERY_PARAM_ISLAND + "} "
+                    + "AND req.relation_code = 'island')");
+        }
         ORDER_BY(BaUnitSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
         sql = SQL();
