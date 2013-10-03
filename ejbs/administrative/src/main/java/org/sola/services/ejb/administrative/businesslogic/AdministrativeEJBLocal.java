@@ -59,7 +59,7 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
      * AdministrativeEJB.getConditionTypes}
      */
     List<ConditionType> getConditionTypes(String languageCode);
-    
+
     /**
      * see {@linkplain AdministrativeEJB#getMortgageTypes(java.lang.String)
      * AdministrativeEJB.getMortgageTypes}
@@ -171,17 +171,23 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
      */
     List<SysRegPubDisStateLand> getSysRegPubDisStateLandByLocation(String searchString, String languageCode);
 
-    List<ValidationResult> publicDisplay(String params, String languageCode) ;
-    
+    List<ValidationResult> publicDisplay(String params, String languageCode);
+
     List<SysRegManagement> getSysRegManagement(SysRegManagementParams params, String languageCode);
-    
+
     List<SysRegStatus> getSysRegStatus(SysRegManagementParams params, String languageCode);
-    
+
     List<SysRegProgress> getSysRegProgress(SysRegManagementParams params, String languageCode);
-    
-    List<Estate> getEstates(String languageCode); 
-    
-    List<District> getIslands(String languageCode); 
-    
-    List<Town> getTowns(String languageCode); 
+
+    List<Estate> getEstates(String languageCode);
+
+    List<District> getIslands(String languageCode);
+
+    List<Town> getTowns(String languageCode);
+
+    /**
+     * See {@linkplain AdministrativeEJB#getPaymentHistory(java.lang.String)
+     * AdministrativeEJB.getPaymentHistory}
+     */
+    List<RrrPaymentHistory> getPaymentHistory(String rrrId);
 }

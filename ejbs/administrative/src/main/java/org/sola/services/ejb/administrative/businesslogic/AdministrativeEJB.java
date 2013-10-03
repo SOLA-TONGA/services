@@ -211,7 +211,7 @@ public class AdministrativeEJB extends AbstractEJB
     /**
      * Saves any updates to an existing BA Unit. Can also be used to create a
      * new BA Unit, however this method does not set any default values on the
-     * BA Unit like null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
+     * BA Unit like null null null null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
      * createBaUnit}. Will also create a new Transaction record for the BA Unit
      * if the Service is not already associated to a Transaction.
      *
@@ -731,7 +731,7 @@ public class AdministrativeEJB extends AbstractEJB
         result = getRepository().getEntityList(District.class, queryParams);
         return result;
     }
-    
+
     @Override
     public List<Town> getTowns(String languageCode) {
         List<Town> result;
@@ -739,6 +739,24 @@ public class AdministrativeEJB extends AbstractEJB
         queryParams.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildGetTownsSql());
         queryParams.put(CommonSqlProvider.PARAM_LANGUAGE_CODE, languageCode);
         result = getRepository().getEntityList(Town.class, queryParams);
+        return result;
+    }
+
+    /**
+     * Obtains the payment history for the Rrr. Checks for records that were
+     * updated by the cashier load process in the rrr_historic table to ensure
+     * these are correctly displayed as payment records.
+     *
+     * @param rrrId Id of the RRR to get payment history for
+     */
+    @Override
+    @RolesAllowed(RolesConstants.ADMINISTRATIVE_BA_UNIT_SEARCH)
+    public List<RrrPaymentHistory> getPaymentHistory(String rrrId) {
+        List<RrrPaymentHistory> result;
+        Map queryParams = new HashMap<String, Object>();
+        queryParams.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildPaymentHistorySql());
+        queryParams.put(RrrPaymentHistory.QUERY_PARAMETER_ID, rrrId);
+        result = getRepository().getEntityList(RrrPaymentHistory.class, queryParams);
         return result;
     }
 }

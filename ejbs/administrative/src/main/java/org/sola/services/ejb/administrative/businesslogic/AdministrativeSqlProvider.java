@@ -31,6 +31,7 @@ package org.sola.services.ejb.administrative.businesslogic;
 
 import org.apache.ibatis.jdbc.SqlBuilder;
 import static org.apache.ibatis.jdbc.SqlBuilder.*;
+import org.sola.services.ejb.administrative.repository.entities.RrrPaymentHistory;
 
 /**
  * Helper class used to build complete SQL strings for advanced SQL queries
@@ -38,12 +39,12 @@ import static org.apache.ibatis.jdbc.SqlBuilder.*;
  * @author soladev
  */
 public class AdministrativeSqlProvider {
-    
+
     /**
-     * SQL to retrieve estates from the ba_unit table including a link to the island
-     * the estate is part of. If there is no island relationship, just the details for
-     * the estate are returned. 
-     * 
+     * SQL to retrieve estates from the ba_unit table including a link to the
+     * island the estate is part of. If there is no island relationship, just
+     * the details for the estate are returned.
+     *
      * @return SQL string to retrieve estate details
      */
     public static String buildGetEstatesSql() {
@@ -62,7 +63,7 @@ public class AdministrativeSqlProvider {
         sql = SqlBuilder.SQL();
         return sql;
     }
-    
+
     public static String buildGetIslandsSql() {
         String sql;
         BEGIN();
@@ -76,7 +77,7 @@ public class AdministrativeSqlProvider {
         sql = SqlBuilder.SQL();
         return sql;
     }
-    
+
     public static String buildGetTownsSql() {
         String sql;
         BEGIN();
@@ -92,6 +93,52 @@ public class AdministrativeSqlProvider {
         WHERE("LOWER(TRIM(ba.name_firstpart)) NOT IN ('', 'expire', 'invalid', 'valid')");
         ORDER_BY("ba.name_firstpart");
         sql = SqlBuilder.SQL();
+        return sql;
+    }
+
+    /**
+     * Obtains the payment history for the Rrr. Checks for records that were
+     * updated by the cashier load process in the rrr_historic table to ensure
+     * these are correctly displayed as payment records.   
+     */
+    public static String buildPaymentHistorySql() {
+        String sql;
+        BEGIN();
+        SELECT("r.id");
+        SELECT("r.due_date");
+        SELECT("r.receipt_date");
+        SELECT("r.receipt_reference");
+        SELECT("r.receipt_amount");
+        SELECT("r.cashier_update");
+        SELECT("r.change_user");
+        FROM("administrative.rrr r");
+        WHERE("EXISTS "
+                + "(SELECT r2.id FROM administrative.rrr r2"
+                + " WHERE  r2.id = #{" + RrrPaymentHistory.QUERY_PARAMETER_ID + "}"
+                + " AND    r.nr = r2.nr"
+                + " AND    r.ba_unit_id = r2.ba_unit_id)");
+        WHERE("(r.due_date IS NOT NULL OR r.receipt_date IS NOT NULL "
+                + "OR r.receipt_reference IS NOT NULL OR r.receipt_amount IS NOT NULL)");
+        sql = SQL() + " UNION ";
+        SELECT("rh.id");
+        SELECT("rh.due_date");
+        SELECT("rh.receipt_date");
+        SELECT("rh.receipt_reference");
+        SELECT("rh.receipt_amount");
+        SELECT("rh.cashier_update");
+        SELECT("rh.change_user");
+        FROM("administrative.rrr_historic rh");
+        WHERE("rh.cashier_update = TRUE");
+        WHERE("EXISTS "
+                + "(SELECT r2.id FROM administrative.rrr r2"
+                + " WHERE  r2.id = #{" + RrrPaymentHistory.QUERY_PARAMETER_ID + "}"
+                + " AND    rh.nr = r2.nr"
+                + " AND    rh.ba_unit_id = r2.ba_unit_id)");
+        WHERE("(rh.due_date IS NOT NULL OR rh.receipt_date IS NOT NULL "
+                + "OR rh.receipt_reference IS NOT NULL OR rh.receipt_amount IS NOT NULL)");
+
+        sql += SQL();
+
         return sql;
     }
 }

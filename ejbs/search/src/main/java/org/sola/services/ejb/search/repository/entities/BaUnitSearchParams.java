@@ -176,22 +176,18 @@ public class BaUnitSearchParams extends AbstractEntity {
      * match.
      */
     public String getRegistryBookRefQueryParam() {
-        String result = "";
-        if (!StringUtility.isEmpty(getRegistryBook())) {
-            result = getRegistryBook() + "\\s";
-            result += StringUtility.isEmpty(getRegistryPageRef()) ? ""
-                    : getRegistryPageRef();
-        } else {
-            result += StringUtility.isEmpty(getRegistryPageRef()) ? ""
-                    : "\\s" + getRegistryPageRef();
-        }
-        return result;
+        String result = StringUtility.isEmpty(getRegistryBook()) ? ""
+                : getRegistryBook();
+        result += StringUtility.isEmpty(getRegistryPageRef()) ? ""
+                : " " + getRegistryPageRef();
+        return result.trim();
     }
 
     /**
      * Indicates if the search is of the specified type.
+     *
      * @param searchType
-     * @return 
+     * @return
      */
     public boolean isSearchType(String searchType) {
         return searchType.equals(getSearchType());
