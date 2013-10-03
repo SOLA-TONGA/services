@@ -33,9 +33,9 @@
  */
 package org.sola.services.ejb.search.repository;
 
-import org.apache.ibatis.jdbc.SqlBuilder;
 import static org.apache.ibatis.jdbc.SqlBuilder.*;
 import org.sola.common.StringUtility;
+import org.sola.services.ejb.search.repository.entities.BaUnitSearchParams;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchResult;
 import org.sola.services.ejb.search.repository.entities.PropertyVerifier;
 
@@ -399,6 +399,152 @@ public class SearchSqlProvider {
     }
 
     /**
+     * Uses the BA Unit Search parameters to build an SQL Query for Allotments.
+     * This method does not inject the search parameter values into the SQL as
+     * that would prevent the database from performing statement caching.
+     *
+     * @param params Object containing the parameter values provided by the user
+     * @return SQL String
+     */
+    public static String buildSearchBaUnitSql(BaUnitSearchParams params) {
+        String sql;
+        BEGIN();
+
+        // Capture fields common for all searches
+        SELECT("DISTINCT prop.id");
+        SELECT("prop.name");
+        SELECT("prop.name_firstpart");
+        SELECT("prop.name_lastpart");
+        SELECT("prop.registered_name");
+        SELECT("prop.type_code");
+        if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)
+                || params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
+            // Retrieve the island details
+            SELECT("(SELECT string_agg(i1.name_firstpart, ',') "
+                    + "FROM administrative.ba_unit i1, "
+                    + "     administrative.required_relationship_baunit req1 "
+                    + "WHERE req1.to_ba_unit_id = prop.id "
+                    + "AND req1.relation_code = 'island' "
+                    + "AND i1.id = req1.from_ba_unit_id ) AS island_name");
+        } else {
+            // Retrieve the town details
+            SELECT("(SELECT string_agg(t1.name_firstpart, ',') "
+                    + "FROM administrative.ba_unit t1, "
+                    + "     administrative.required_relationship_baunit req1 "
+                    + "WHERE req1.to_ba_unit_id = prop.id "
+                    + "AND req1.relation_code = 'town' "
+                    + "AND t1.id = req1.from_ba_unit_id ) AS town_name");
+        }
+        FROM("administrative.ba_unit prop");
+
+        if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
+            SELECT("prop.status_code");
+        } else {
+            // Caputre fields required for all but town searches
+            SELECT("(SELECT string_agg(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, ''), ',') "
+                    + "FROM administrative.party_for_rrr pr1, party.party p1 "
+                    + "WHERE pr1.rrr_id = rrr.id "
+                    + "AND p1.id = pr1.party_id ) AS rightholders");
+            SELECT("rrr.registry_book_ref");
+            SELECT("rrr.registration_date");
+            // Show the status code of the rrr instead of the property
+            SELECT("rrr.status_code");
+            SELECT("rrr.type_code as rrr_type_code");
+            FROM("administrative.rrr rrr");
+            WHERE("rrr.ba_unit_id = prop.id");
+
+            if (!StringUtility.isEmpty(params.getNameFirstPart())
+                    || !StringUtility.isEmpty(params.getNameLastPart())) {
+                // BA Unit Name provided so only search the current primary rrr
+                WHERE("rrr.status_code = 'current'");
+                WHERE("rrr.is_primary = TRUE");
+            }
+        }
+
+        if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_LEASE)) {
+            SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
+            WHERE("prop.type_code = 'leasedUnit'");
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
+            WHERE("prop.type_code = 'estateUnit'");
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
+            WHERE("prop.type_code IN ('townUnit', 'islandUnit')");
+        } else {
+            // Allotment search
+            if (params.isTaxAllotment() == params.isTownAllotment()) {
+                // Ensure there is always type_code criteria
+                WHERE("prop.type_code IN ('taxUnit', 'townAllotmentUnit')");
+            } else if (params.isTaxAllotment()) {
+                WHERE("prop.type_code = 'taxUnit'");
+            } else if (params.isTownAllotment()) {
+                WHERE("prop.type_code = 'townAllotmentUnit'");
+            }
+        }
+
+        if (!StringUtility.isEmpty(params.getOwnerName())) {
+            FROM("administrative.party_for_rrr pr");
+            FROM("party.party p");
+            WHERE("pr.rrr_id = rrr.id");
+            WHERE("p.id = pr.party_id");
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_OWNER_NAME + "}, "
+                    + "COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '') || ' ' || COALESCE(p.alias, ''))");
+        }
+
+        if (!StringUtility.isEmpty(params.getNameFirstPart())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_FIRSTPART
+                    + "}, COALESCE(prop.name_firstpart, ''))");
+        }
+
+        if (!StringUtility.isEmpty(params.getNameLastPart())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_LASTPART
+                    + "}, COALESCE(prop.name_lastpart, ''))");
+        }
+
+        if (!StringUtility.isEmpty(params.getParcelName())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_PARCEL_NAME
+                    + "}, COALESCE(prop.registered_name, ''))");
+        }
+
+        if (!StringUtility.isEmpty(params.getRegistryBookRefQueryParam())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_REGISTRY_BOOK_REF
+                    + "}, COALESCE(rrr.registry_book_ref, ''))");
+        }
+
+        if (params.getRegisteredDateFrom() != null) {
+            WHERE("rrr.registration_date >= #{" + BaUnitSearchResult.QUERY_PARAM_REGISTRATION_FROM_DATE + "}");
+        }
+
+        if (params.getRegisteredDateTo() != null) {
+            WHERE("rrr.registration_date <= #{" + BaUnitSearchResult.QUERY_PARAM_REGISTRATION_TO_DATE + "}");
+        }
+
+        if (!StringUtility.isEmpty(params.getOtherRightholder())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_OTHER_RIGHTHOLDER
+                    + "}, COALESCE(administrative.get_other_rightholder_name(rrr.id), ''))");
+        }
+
+        if (!StringUtility.isEmpty(params.getTownId())) {
+            WHERE("EXISTS (SELECT req.from_ba_unit_id "
+                    + "FROM administrative.required_relationship_baunit req "
+                    + "WHERE req.to_ba_unit_id = prop.id "
+                    + "AND req.from_ba_unit_id = #{" + BaUnitSearchResult.QUERY_PARAM_TOWN + "} "
+                    + "AND req.relation_code = 'town')");
+        }
+
+        if (!StringUtility.isEmpty(params.getIslandId())
+                && params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
+            WHERE("EXISTS (SELECT req.from_ba_unit_id "
+                    + "FROM administrative.required_relationship_baunit req "
+                    + "WHERE req.to_ba_unit_id = prop.id "
+                    + "AND req.from_ba_unit_id = #{" + BaUnitSearchResult.QUERY_PARAM_ISLAND + "} "
+                    + "AND req.relation_code = 'island')");
+        }
+        ORDER_BY(BaUnitSearchResult.QUERY_ORDER_BY
+                + " LIMIT 100");
+        sql = SQL();
+        return sql;
+    }
+
+    /**
      * Uses the BA Unit Search parameters to build an appropriate SQL Query.
      * This method does not inject the search parameter values into the SQL as
      * that would prevent the database from performing statement caching.
@@ -423,8 +569,9 @@ public class SearchSqlProvider {
                 + "AND rrr1.status_code = 'current' "
                 + "AND pr1.rrr_id = rrr1.id "
                 + "AND p1.id = pr1.party_id ) AS rightholders");
+        SELECT("prop.type_code");
         FROM("administrative.ba_unit prop");
-        if (owernName != null) {
+        if (!StringUtility.isEmpty(owernName)) {
             FROM("administrative.rrr rrr");
             FROM("administrative.party_for_rrr pr");
             FROM("party.party p");
@@ -435,11 +582,11 @@ public class SearchSqlProvider {
             WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_OWNER_NAME + "}, "
                     + "COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '') || ' ' || COALESCE(p.alias, ''))");
         }
-        if (nameFirstPart != null) {
+        if (!StringUtility.isEmpty(nameFirstPart)) {
             WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_FIRSTPART
                     + "}, COALESCE(prop.name_firstpart, ''))");
         }
-        if (nameLastPart != null) {
+        if (!StringUtility.isEmpty(nameLastPart)) {
             WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_LASTPART
                     + "}, COALESCE(prop.name_lastpart, ''))");
         }

@@ -747,24 +747,26 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
     public List<BaUnitSearchResult> searchBaUnits(BaUnitSearchParams searchParams) {
         Map params = new HashMap<String, Object>();
 
-        if (searchParams.getNameFirstPart() != null
-                && searchParams.getNameFirstPart().trim().isEmpty()) {
-            searchParams.setNameFirstPart(null);
+        if (StringUtility.isEmpty(searchParams.getSearchType())) {
+            // Configure the original Property Search parameters. 
+            params.put(CommonSqlProvider.PARAM_QUERY,
+                    SearchSqlProvider.buildSearchBaUnitSql(searchParams.getNameFirstPart(),
+                    searchParams.getNameLastPart(), searchParams.getOwnerName()));
+        } else {
+            params.put(CommonSqlProvider.PARAM_QUERY,
+                    SearchSqlProvider.buildSearchBaUnitSql(searchParams));
         }
-        if (searchParams.getNameLastPart() != null
-                && searchParams.getNameLastPart().trim().isEmpty()) {
-            searchParams.setNameLastPart(null);
-        }
-        if (searchParams.getOwnerName() != null && searchParams.getOwnerName().trim().isEmpty()) {
-            searchParams.setOwnerName(null);
-        }
-
-        params.put(CommonSqlProvider.PARAM_QUERY,
-                SearchSqlProvider.buildSearchBaUnitSql(searchParams.getNameFirstPart(),
-                searchParams.getNameLastPart(), searchParams.getOwnerName()));
         params.put(BaUnitSearchResult.QUERY_PARAM_OWNER_NAME, searchParams.getOwnerName());
         params.put(BaUnitSearchResult.QUERY_PARAM_NAME_FIRSTPART, searchParams.getNameFirstPart());
         params.put(BaUnitSearchResult.QUERY_PARAM_NAME_LASTPART, searchParams.getNameLastPart());
+        params.put(BaUnitSearchResult.QUERY_PARAM_PARCEL_NAME, searchParams.getParcelName());
+        params.put(BaUnitSearchResult.QUERY_PARAM_REGISTRATION_FROM_DATE, searchParams.getRegisteredDateFrom());
+        params.put(BaUnitSearchResult.QUERY_PARAM_REGISTRATION_TO_DATE, searchParams.getRegisteredDateTo());
+        params.put(BaUnitSearchResult.QUERY_PARAM_REGISTRY_BOOK_REF, searchParams.getRegistryBookRefQueryParam());
+        params.put(BaUnitSearchResult.QUERY_PARAM_TOWN, searchParams.getTownId());
+        params.put(BaUnitSearchResult.QUERY_PARAM_ISLAND, searchParams.getIslandId());
+        params.put(BaUnitSearchResult.QUERY_PARAM_OTHER_RIGHTHOLDER, searchParams.getOtherRightholder());
+
         return getRepository().getEntityList(BaUnitSearchResult.class, params);
     }
 
