@@ -104,6 +104,11 @@ public class Rrr extends AbstractVersionedEntity {
     private Date receiptDate;
     @Column(name = "receipt_reference")
     private String receiptReference;
+    @Column(name = "receipt_amount")
+    private BigDecimal receiptAmount;
+    @Column(name = "other_rightholder_name")
+    @AccessFunctions(onSelect = "administrative.get_other_rightholder_name(id)")
+    private String otherRightholderName;
     // Child entity fields
     @ChildEntity(insertBeforeParent = false, parentIdField = "rrrId")
     private BaUnitNotation notation;
@@ -310,6 +315,22 @@ public class Rrr extends AbstractVersionedEntity {
 
     public void setReceiptReference(String receiptReference) {
         this.receiptReference = receiptReference;
+    }
+
+    public BigDecimal getReceiptAmount() {
+        return receiptAmount;
+    }
+
+    public void setReceiptAmount(BigDecimal receiptAmount) {
+        this.receiptAmount = receiptAmount;
+    }
+
+    public String getOtherRightholderName() {
+        return otherRightholderName;
+    }
+
+    public void setOtherRightholderName(String otherRightholderName) {
+        this.otherRightholderName = otherRightholderName;
     }
 
     public BaUnitNotation getNotation() {

@@ -415,7 +415,6 @@ public class SearchSqlProvider {
         SELECT("prop.name");
         SELECT("prop.name_firstpart");
         SELECT("prop.name_lastpart");
-        SELECT("prop.status_code");
         SELECT("prop.registered_name");
         SELECT("prop.type_code");
         if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)
@@ -438,21 +437,28 @@ public class SearchSqlProvider {
         }
         FROM("administrative.ba_unit prop");
 
-        if (!params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
+        if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
+            SELECT("prop.status_code");
+        } else {
             // Caputre fields required for all but town searches
             SELECT("(SELECT string_agg(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, ''), ',') "
-                    + "FROM administrative.rrr rrr1, administrative.party_for_rrr pr1, party.party p1 "
-                    + "WHERE rrr1.ba_unit_id = prop.id "
-                    + "AND rrr1.status_code = 'current' "
-                    + "AND rrr1.is_primary = TRUE "
-                    + "AND pr1.rrr_id = rrr1.id "
+                    + "FROM administrative.party_for_rrr pr1, party.party p1 "
+                    + "WHERE pr1.rrr_id = rrr.id "
                     + "AND p1.id = pr1.party_id ) AS rightholders");
             SELECT("rrr.registry_book_ref");
             SELECT("rrr.registration_date");
+            // Show the status code of the rrr instead of the property
+            SELECT("rrr.status_code");
+            SELECT("rrr.type_code as rrr_type_code");
             FROM("administrative.rrr rrr");
             WHERE("rrr.ba_unit_id = prop.id");
-            WHERE("rrr.status_code = 'current'");
-            WHERE("rrr.is_primary = TRUE");
+
+            if (!StringUtility.isEmpty(params.getNameFirstPart())
+                    || !StringUtility.isEmpty(params.getNameLastPart())) {
+                // BA Unit Name provided so only search the current primary rrr
+                WHERE("rrr.status_code = 'current'");
+                WHERE("rrr.is_primary = TRUE");
+            }
         }
 
         if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_LEASE)) {

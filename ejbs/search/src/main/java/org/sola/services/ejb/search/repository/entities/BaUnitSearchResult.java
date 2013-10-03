@@ -74,6 +74,8 @@ public class BaUnitSearchResult extends AbstractReadOnlyEntity {
     private String registryBookRef;
     @Column(name = "type_code")
     private String baUnitTypeCode;
+    @Column(name = "rrr_type_code")
+    private String rrrTypeCode;
 
     public BaUnitSearchResult() {
         super();
@@ -181,5 +183,13 @@ public class BaUnitSearchResult extends AbstractReadOnlyEntity {
 
     public void setBaUnitTypeCode(String baUnitTypeCode) {
         this.baUnitTypeCode = baUnitTypeCode;
-    } 
+    }
+
+    public String getRrrTypeCode() {
+        return rrrTypeCode;
+    }
+
+    public void setRrrTypeCode(String rrrTypeCode) {
+        this.rrrTypeCode = rrrTypeCode;
+    }
 }
