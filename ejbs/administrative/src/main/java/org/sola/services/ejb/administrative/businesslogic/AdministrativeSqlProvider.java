@@ -141,4 +141,20 @@ public class AdministrativeSqlProvider {
 
         return sql;
     }
+    
+    public static String buildCashierImportSql() {
+        String sql;
+        BEGIN();
+        SELECT("b1.id");
+        SELECT("b2.lease_num");
+        FROM("administrative.rrr b1");
+        FROM("table b2");
+        WHERE("b1.type_code = 'lease'");
+        INNER_JOIN("b1.id = b2.lease_num");
+        ORDER_BY("b1.expiration_date");
+        sql = SqlBuilder.SQL();
+        return sql;
+    }
+    
+    
 }

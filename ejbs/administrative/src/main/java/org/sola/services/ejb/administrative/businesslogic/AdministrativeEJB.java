@@ -759,4 +759,16 @@ public class AdministrativeEJB extends AbstractEJB
         result = getRepository().getEntityList(RrrPaymentHistory.class, queryParams);
         return result;
     }
+    
+    @Override
+    public List<CashierImport> saveCashierImport() {
+        List<CashierImport> result = null;
+        Map params = new HashMap<String, Object>();
+        params.put(CommonSqlProvider.PARAM_SELECT_PART, AdministrativeSqlProvider.buildCashierImportSql());
+        List<CashierImport> cashierImportList = getRepository().getEntityList(CashierImport.class, params);
+//        for (CashierImport cashier : cashierImportList) {
+//            
+//        }
+        return result;
+    }
 }

@@ -65,6 +65,7 @@ public class Rrr extends AbstractVersionedEntity {
     public static final String QUERY_WHERE_BYTRANSACTIONID = "transaction_id = "
             + "#{" + QUERY_PARAMETER_TRANSACTIONID + "}";
     public static final String QUERY_ORDER_BY = " status_code, nr ";
+    
     @Id
     @Column(name = "id")
     private String id;
