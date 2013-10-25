@@ -31,6 +31,7 @@ package org.sola.services.ejb.administrative.businesslogic;
 
 import org.apache.ibatis.jdbc.SqlBuilder;
 import static org.apache.ibatis.jdbc.SqlBuilder.*;
+import org.sola.services.ejb.administrative.repository.entities.CashierImport;
 import org.sola.services.ejb.administrative.repository.entities.RrrPaymentHistory;
 
 /**
@@ -99,7 +100,7 @@ public class AdministrativeSqlProvider {
     /**
      * Obtains the payment history for the Rrr. Checks for records that were
      * updated by the cashier load process in the rrr_historic table to ensure
-     * these are correctly displayed as payment records.   
+     * these are correctly displayed as payment records.
      */
     public static String buildPaymentHistorySql() {
         String sql;
@@ -141,20 +142,24 @@ public class AdministrativeSqlProvider {
 
         return sql;
     }
-    
-    public static String buildCashierImportSql() {
+
+    /**
+     * Obtains the id of the RRR lease record based on the lease number
+     */
+    public static String buildGetRrrIdByLeaseNumberSql() {
         String sql;
         BEGIN();
-        SELECT("b1.id");
-        SELECT("b2.lease_num");
-        FROM("administrative.rrr b1");
-        FROM("table b2");
-        WHERE("b1.type_code = 'lease'");
-        INNER_JOIN("b1.id = b2.lease_num");
-        ORDER_BY("b1.expiration_date");
-        sql = SqlBuilder.SQL();
+        SELECT("r.id");
+        FROM("administrative.rrr r");
+        FROM("administrative.ba_unit b");
+        WHERE("r.ba_unit_id = b.id");
+        WHERE("b.name_firstpart = #{" + CashierImport.QUERY_PARAMETER_LEASE_NUMBER + "}");
+        WHERE("r.type_code = 'lease'");
+        WHERE("r.status_code = b.status_code "
+                + "LIMIT 1");
+
+        sql = SQL();
+
         return sql;
     }
-    
-    
 }

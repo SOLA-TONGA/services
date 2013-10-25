@@ -190,6 +190,6 @@ public interface AdministrativeEJBLocal extends AbstractSolaTransactionEJBLocal 
      * AdministrativeEJB.getPaymentHistory}
      */
     List<RrrPaymentHistory> getPaymentHistory(String rrrId);
-    
-    List<CashierImport> saveCashierImport();
+
+    String saveCashierImport(List<CashierImport> cashierRecords); 
 }

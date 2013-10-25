@@ -71,6 +71,8 @@ import org.sola.services.common.repository.entities.AbstractEntity;
     RolesConstants.ADMINISTRATIVE_BA_UNIT_SAVE,
     RolesConstants.ADMINISTRATIVE_BA_UNIT_PRINT_CERT,
     RolesConstants.ADMINISTRATIVE_BA_UNIT_SEARCH,
+    RolesConstants.ADMINISTRATIVE_CASHIER_IMPORT,
+    RolesConstants.ADMINISTRATIVE_RIGHTS_EXPORT,
     RolesConstants.SOURCE_TRANSACTIONAL,
     RolesConstants.SOURCE_SAVE,
     RolesConstants.SOURCE_SEARCH,

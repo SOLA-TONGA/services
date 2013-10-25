@@ -37,6 +37,7 @@ import javax.ejb.Stateless;
 import org.sola.common.DateUtility;
 import org.sola.common.RolesConstants;
 import org.sola.common.SOLAException;
+import org.sola.common.StringUtility;
 import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.EntityAction;
 import org.sola.services.common.LocalInfo;
@@ -211,7 +212,8 @@ public class AdministrativeEJB extends AbstractEJB
     /**
      * Saves any updates to an existing BA Unit. Can also be used to create a
      * new BA Unit, however this method does not set any default values on the
-     * BA Unit like null null null null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
+     * BA Unit like null null null null null null null null null null null null
+     * null null null null null null null null null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
      * createBaUnit}. Will also create a new Transaction record for the BA Unit
      * if the Service is not already associated to a Transaction.
      *
@@ -759,16 +761,59 @@ public class AdministrativeEJB extends AbstractEJB
         result = getRepository().getEntityList(RrrPaymentHistory.class, queryParams);
         return result;
     }
-    
+
+    /**
+     * Processes lease payment records from the Cashier database and updates the
+     * details into SOLA.
+     *
+     * Note that the repository will only issue an update if at least one of the
+     * attribute values on the paymentHistory record is changed. This will
+     * ensure any records from the cashier database that are resubmitted to SOLA
+     * will not result in false updates.
+     *
+     * @param cashierRecords
+     * @return Validation and progress message.
+     */
     @Override
-    public List<CashierImport> saveCashierImport() {
-        List<CashierImport> result = null;
+    @RolesAllowed(RolesConstants.ADMINISTRATIVE_CASHIER_IMPORT)
+    public String saveCashierImport(List<CashierImport> cashierRecords) {
+        String result = "";
+        int count = 0;
         Map params = new HashMap<String, Object>();
-        params.put(CommonSqlProvider.PARAM_SELECT_PART, AdministrativeSqlProvider.buildCashierImportSql());
-        List<CashierImport> cashierImportList = getRepository().getEntityList(CashierImport.class, params);
-//        for (CashierImport cashier : cashierImportList) {
-//            
-//        }
+        params.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildGetRrrIdByLeaseNumberSql());
+        for (CashierImport rec : cashierRecords) {
+            if (CashierImport.PAYMENT_TYPE_LEASE.equalsIgnoreCase(rec.getPaymentDescription())) {
+                // Process the lease payment
+                if (!StringUtility.isEmpty(rec.getLeaseNumber())) {
+                    params.remove(CashierImport.QUERY_PARAMETER_LEASE_NUMBER);
+                    params.put(CashierImport.QUERY_PARAMETER_LEASE_NUMBER, rec.getLeaseNumber());
+                    // Try to locate the Rrr for this payment record using the lease number. 
+                    String rrrId = getRepository().getScalar(String.class, params);
+                    if (rrrId != null) {
+                        // Load and update the payment history for the lease. 
+                        count++;
+                        RrrPaymentHistory paymentHistory = getRepository().getEntity(RrrPaymentHistory.class, rrrId);
+                        paymentHistory.setReceiptAmount(rec.getTotalPayment());
+                        paymentHistory.setReceiptDate(rec.getPaymentDate());
+                        if (!StringUtility.isEmpty(rec.getPaymentParticulars())) {
+                            // Add particulars to the receipt number if provided
+                            paymentHistory.setReceiptReference(rec.getReceiptNumber()
+                                    + " (" + rec.getPaymentParticulars() + ")");
+                        } else {
+                            paymentHistory.setReceiptReference(rec.getReceiptNumber());
+                        }
+                        getRepository().saveEntity(paymentHistory);
+                    } else {
+                        result += "Unable to locate lease " + rec.getLeaseNumber()
+                                + " referenced by record " + rec.getRecordId() + System.lineSeparator();
+                    }
+                }
+            } else {
+                result += "No lease number provided for record "
+                        + rec.getRecordId() + System.lineSeparator();
+            }
+        }
+        result += "Updated payment details for " + count + " leases";
         return result;
     }
 }
