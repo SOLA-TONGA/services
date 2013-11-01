@@ -464,6 +464,9 @@ public class SearchSqlProvider {
         if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_LEASE)) {
             SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
             WHERE("prop.type_code = 'leasedUnit'");
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_SUBLEASE)) {
+            SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
+            WHERE("prop.type_code = 'subleaseUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
             WHERE("prop.type_code = 'estateUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {

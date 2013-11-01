@@ -37,6 +37,7 @@ public class BaUnitSearchParams extends AbstractEntity {
 
     public static final String SEARCH_TYPE_ALLOTMENT = "allotment";
     public static final String SEARCH_TYPE_LEASE = "lease";
+    public static final String SEARCH_TYPE_SUBLEASE = "sublease";
     public static final String SEARCH_TYPE_ESTATE = "estate";
     public static final String SEARCH_TYPE_TOWN = "town";
     private String nameFirstPart;
