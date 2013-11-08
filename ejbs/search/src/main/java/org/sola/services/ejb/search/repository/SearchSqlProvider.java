@@ -455,8 +455,9 @@ public class SearchSqlProvider {
 
             if (!StringUtility.isEmpty(params.getNameFirstPart())
                     || !StringUtility.isEmpty(params.getNameLastPart())) {
-                // BA Unit Name provided so only search the current primary rrr
-                WHERE("rrr.status_code = 'current'");
+                // BA Unit Name provided so only search the primary rrr matching 
+                // the status of the ba unit
+                WHERE("rrr.status_code = prop.status_code");
                 WHERE("rrr.is_primary = TRUE");
             }
         }
