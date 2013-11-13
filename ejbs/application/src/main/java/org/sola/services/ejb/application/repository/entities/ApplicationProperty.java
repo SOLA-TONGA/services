@@ -96,6 +96,12 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private boolean leaseLinked;
     @Column(name = "lease_ba_unit_id")
     private String leaseBaUnitId;
+    @Column(name = "sublease_number")
+    private String subleaseNumber;
+    @Column(name = "sublease_linked")
+    private boolean subleaseLinked;
+    @Column(name = "sublease_ba_unit_id")
+    private String subleaseBaUnitId;
 
     public ApplicationProperty() {
         super();
@@ -253,6 +259,7 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     public void setTownId(String townId) {
         this.townId = townId;
     }
+
     public String getDescription() {
         return description;
     }
@@ -284,6 +291,28 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     public void setLeaseBaUnitId(String leaseBaUnitId) {
         this.leaseBaUnitId = leaseBaUnitId;
     }
-    
-    
+
+    public String getSubleaseNumber() {
+        return subleaseNumber;
+    }
+
+    public void setSubleaseNumber(String subleaseNumber) {
+        this.subleaseNumber = subleaseNumber;
+    }
+
+    public boolean isSubleaseLinked() {
+        return subleaseLinked;
+    }
+
+    public void setSubleaseLinked(boolean subleaseLinked) {
+        this.subleaseLinked = subleaseLinked;
+    }
+
+    public String getSubleaseBaUnitId() {
+        return subleaseBaUnitId;
+    }
+
+    public void setSubleaseBaUnitId(String subleaseBaUnitId) {
+        this.subleaseBaUnitId = subleaseBaUnitId;
+    }
 }

@@ -34,194 +34,229 @@ import java.util.Date;
 import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 
 public class PropertyVerifier extends AbstractReadOnlyEntity {
-
+    
     public static final String QUERY_PARAM_FIRST_PART = "firstPart";
     public static final String QUERY_PARAM_LAST_PART = "lastPart";
     public static final String QUERY_PARAM_LEASE_NUM = "leaseNum";
+    public static final String QUERY_PARAM_SUBLEASE_NUM = "subleaseNum";
     public static final String QUERY_PARAM_APPLICATION_NUMBER = "applicationNumber";
     private LeaseVerifier leaseVerifier;
     private AllotmentVerifier allotmentVerifier;
+    private SubleaseVerifier subleaseVerifier;
     private String applicationsWhereFound;
-
+    
     public PropertyVerifier() {
         super();
         allotmentVerifier = new AllotmentVerifier();
         leaseVerifier = new LeaseVerifier();
+        subleaseVerifier = new SubleaseVerifier();
     }
-
+    
     public PropertyVerifier(LeaseVerifier lease, AllotmentVerifier lot,
-            String apps) {
+            SubleaseVerifier sublease, String apps) {
         super();
         leaseVerifier = lease;
         allotmentVerifier = lot;
+        subleaseVerifier = sublease;
         applicationsWhereFound = apps;
     }
-
-    public String getLotbaUnitId() {
+    
+    public String getLotBaUnitId() {
         return allotmentVerifier == null ? null : allotmentVerifier.getLotbaUnitId();
     }
-
-    public void setLotbaUnitId(String lotbaUnitId) {
+    
+    public void setLotBaUnitId(String lotbaUnitId) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setLotbaUnitId(lotbaUnitId);
         }
     }
-
+    
     public String getDeedNumber() {
         return allotmentVerifier == null ? null : allotmentVerifier.getDeedNumber();
     }
-
+    
     public void setDeedNumber(String deedNumber) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setDeedNumber(deedNumber);
         }
     }
-
+    
     public String getFolio() {
         return allotmentVerifier == null ? null : allotmentVerifier.getFolio();
     }
-
+    
     public void setFolio(String folio) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setFolio(folio);
         }
     }
-
+    
     public String getHolderName() {
         return allotmentVerifier == null ? null : allotmentVerifier.getHolderName();
     }
-
+    
     public void setHolderName(String holderName) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setHolderName(holderName);
         }
     }
-
+    
     public String getIslandId() {
         return allotmentVerifier == null ? null : allotmentVerifier.getIslandId();
     }
-
+    
     public void setIslandId(String islandId) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setIslandId(islandId);
         }
     }
-
+    
     public String getTownId() {
         return allotmentVerifier == null ? null : allotmentVerifier.getTownId();
     }
-
+    
     public void setTownId(String townId) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setTownId(townId);
         }
     }
-
+    
     public String getLandUseCode() {
         return allotmentVerifier == null ? null : allotmentVerifier.getLandUseCode();
     }
-
+    
     public void setLandUseCode(String landUseCode) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setLandUseCode(landUseCode);
         }
     }
-
+    
     public BigDecimal getLotArea() {
         return allotmentVerifier == null ? null : allotmentVerifier.getLotArea();
     }
-
+    
     public void setLotArea(BigDecimal lotArea) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setLotArea(lotArea);
         }
     }
-
+    
     public Date getLotRegistrationDate() {
         return allotmentVerifier == null ? null : allotmentVerifier.getLotRegistrationDate();
     }
-
+    
     public void setLotRegistrationDate(Date lotRegistrationDate) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setLotRegistrationDate(lotRegistrationDate);
         }
     }
-
+    
     public boolean isLeaseLinked() {
         return allotmentVerifier == null ? false : allotmentVerifier.isLeaseLinked();
     }
-
+    
     public void setLeaseLinked(boolean leaseLinked) {
         if (allotmentVerifier != null) {
             allotmentVerifier.setLeaseLinked(leaseLinked);
         }
     }
-
+    
     public String getLeaseBaUnitId() {
         return leaseVerifier == null ? null : leaseVerifier.getLeaseBaUnitId();
     }
-
+    
     public void setLeaseBaUnitId(String leaseBaUnitId) {
         if (leaseVerifier != null) {
             leaseVerifier.setLeaseBaUnitId(leaseBaUnitId);
         }
     }
-
+    
     public String getLeaseNumber() {
         return leaseVerifier == null ? null : leaseVerifier.getLeaseNumber();
     }
-
+    
     public void setLeaseNumber(String leaseNumber) {
         if (leaseVerifier != null) {
             leaseVerifier.setLeaseNumber(leaseNumber);
         }
     }
-
+    
     public String getLesseeName() {
         return leaseVerifier == null ? null : leaseVerifier.getLesseeName();
     }
-
+    
     public void setLesseeName(String lesseeName) {
         if (leaseVerifier != null) {
             leaseVerifier.setLesseeName(lesseeName);
         }
     }
-
+    
     public BigDecimal getLeaseArea() {
         return leaseVerifier == null ? null : leaseVerifier.getLeaseArea();
     }
-
+    
     public void setLeaseArea(BigDecimal leaseArea) {
         if (leaseVerifier != null) {
             leaseVerifier.setLeaseArea(leaseArea);
         }
     }
-
+    
     public BigDecimal getLeaseRental() {
         return leaseVerifier == null ? null : leaseVerifier.getLeaseRental();
     }
-
+    
     public void setLeaseRental(BigDecimal leaseRental) {
         if (leaseVerifier != null) {
             leaseVerifier.setLeaseRental(leaseRental);
         }
     }
-
+    
     public BigDecimal getLeaseTerm() {
         return leaseVerifier == null ? null : leaseVerifier.getLeaseTerm();
     }
-
+    
     public void setLeaseTerm(BigDecimal leaseTerm) {
         if (leaseVerifier != null) {
             leaseVerifier.setLeaseTerm(leaseTerm);
         }
     }
-
+    
     public String getApplicationsWhereFound() {
         return applicationsWhereFound;
     }
-
+    
     public void setApplicationsWhereFound(String applicationsWhereFound) {
         this.applicationsWhereFound = applicationsWhereFound;
+    }
+    
+    public String getSubleaseNumber() {
+        return subleaseVerifier == null ? null : subleaseVerifier.getSubleaseNumber();
+    }
+    
+    public void setSubleaseNumber(String subleaseNumber) {
+        if (subleaseVerifier != null) {
+            subleaseVerifier.setSubleaseNumber(subleaseNumber);
+        }
+    }
+    
+    public String getSubleaseBaUnitId() {
+        return subleaseVerifier == null ? null : subleaseVerifier.getSubleaseBaUnitId();
+    }
+    
+    public void setSubleaseBaUnitId(String subleaseBaUnitId) {
+        if (subleaseVerifier != null) {
+            subleaseVerifier.setSubleaseBaUnitId(subleaseBaUnitId);
+        }
+    }
+    
+    public boolean isSubleaseLinked() {
+        return subleaseVerifier == null ? false : subleaseVerifier.isSubleaseLeaseLinked()
+                || subleaseVerifier.isSubleaseLotLinked();
+    }
+    
+    public void setSubleaseLinked(boolean subleaseLinked) {
+        if (subleaseVerifier != null) {
+            subleaseVerifier.setSubleaseLeaseLinked(subleaseLinked);
+        }
     }
 }
