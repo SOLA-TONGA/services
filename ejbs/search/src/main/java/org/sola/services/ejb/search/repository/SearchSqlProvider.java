@@ -455,8 +455,9 @@ public class SearchSqlProvider {
 
             if (!StringUtility.isEmpty(params.getNameFirstPart())
                     || !StringUtility.isEmpty(params.getNameLastPart())) {
-                // BA Unit Name provided so only search the current primary rrr
-                WHERE("rrr.status_code = 'current'");
+                // BA Unit Name provided so only search the primary rrr matching 
+                // the status of the ba unit
+                WHERE("rrr.status_code = prop.status_code");
                 WHERE("rrr.is_primary = TRUE");
             }
         }
@@ -464,6 +465,9 @@ public class SearchSqlProvider {
         if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_LEASE)) {
             SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
             WHERE("prop.type_code = 'leasedUnit'");
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_SUBLEASE)) {
+            SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
+            WHERE("prop.type_code = 'subleaseUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
             WHERE("prop.type_code = 'estateUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
@@ -495,8 +499,14 @@ public class SearchSqlProvider {
         }
 
         if (!StringUtility.isEmpty(params.getNameLastPart())) {
-            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_LASTPART
-                    + "}, COALESCE(prop.name_lastpart, ''))");
+
+            if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_SUBLEASE)) {
+                WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_LASTPART
+                        + "}, COALESCE(prop.name, ''))");
+            } else {
+                WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_NAME_LASTPART
+                        + "}, COALESCE(prop.name_lastpart, ''))");
+            }
         }
 
         if (!StringUtility.isEmpty(params.getParcelName())) {
@@ -717,21 +727,75 @@ public class SearchSqlProvider {
     }
 
     /**
+     * Builds a SQL string to retrieve property information. Used to verify if
+     * the sublease details entered for a new application match details in the
+     * database. Customization for Tonga.
+     *
+     * @param subleaseNumber The sublease number for the sublease
+     */
+    public static String buildSubleaseVerifierSql(String subleaseNumber, String leaseNumber,
+            String nameFirstPart, String nameLastPart) {
+        String sql;
+
+        // Retrieve details about the lease
+        BEGIN();
+        SELECT("b.id AS sublease_id");
+        FROM("administrative.ba_unit b");
+        FROM("administrative.rrr r");
+        WHERE("b.name = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} ");
+        WHERE("b.type_code = 'subleaseUnit'");
+        WHERE("b.status_code = 'current'");
+        WHERE("r.ba_unit_id = b.id");
+        WHERE("r.status_code = 'current'");
+        WHERE("r.type_code = 'sublease'");
+
+        if (!StringUtility.isEmpty(leaseNumber)) {
+            // Check if the sublease is linked to the lease
+            SELECT("COALESCE((SELECT (lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}) "
+                    + "FROM administrative.required_relationship_baunit sublease_rel,"
+                    + "     administrative.ba_unit lease "
+                    + "WHERE sublease_rel.to_ba_unit_id = b.id "
+                    + "AND sublease_rel.relation_code = 'sublease' "
+                    + "AND lease.id = sublease_rel.from_ba_unit_id "
+                    + "AND lease.type_code = 'leasedUnit' "
+                    + "AND lease.status_code = 'current'), false) AS sublease_lease_linked");
+        }
+
+        if (!StringUtility.isEmpty(nameFirstPart) && !StringUtility.isEmpty(nameLastPart)) {
+            // Check if the sublease is linked to the allotment
+            SELECT("COALESCE((SELECT (lot.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "}"
+                    + "AND lot.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "}) "
+                    + "FROM administrative.required_relationship_baunit sublease_rel,"
+                    + "     administrative.ba_unit lot "
+                    + "WHERE sublease_rel.to_ba_unit_id = b.id "
+                    + "AND sublease_rel.relation_code = 'sublease' "
+                    + "AND lot.id = sublease_rel.from_ba_unit_id "
+                    + "AND lot.type_code IN ('townAllotmentUnit', 'taxUnit') "
+                    + "AND lot.status_code = 'current'), false) AS sublease_lot_linked");
+        }
+
+        sql = SQL();
+
+        return sql;
+    }
+
+    /**
      * Builds a SQL string to check if any other applications link to the
-     * allotment and/or lease used by the specified application. Customization
-     * for Tonga.
+     * allotment and/or lease / sublease used by the specified application.
+     * Customization for Tonga.
      *
      * @param appNumber The number for the new application the property details
      * will be associated with.
      * @param nameFirstPart The deed number of the allotment
      * @param nameLastPart The folio of the allotment
      * @param leaseNumber The lease number for the lease
+     * @param subleaseNumber The sublease number for the sublease
      */
     public static String buildApplicationVerifierSql(String appNumber, String nameFirstPart,
-            String nameLastPart, String leaseNumber) {
+            String nameLastPart, String leaseNumber, String subleaseNumber) {
         String sql;
 
-        // Check if there are any pending applications on this lease or allotment
+        // Check if there are any pending applications on this lease, sublease or allotment
         BEGIN();
         SELECT("string_agg(nr, ',') AS applications_where_found");
         FROM("application.application a");
@@ -740,16 +804,41 @@ public class SearchSqlProvider {
         WHERE("a.status_code = 'lodged'");
         WHERE("a.nr != #{" + PropertyVerifier.QUERY_PARAM_APPLICATION_NUMBER + "}");
         if (!StringUtility.isEmpty(nameFirstPart) && !StringUtility.isEmpty(nameLastPart)) {
-            if (!StringUtility.isEmpty(leaseNumber)) {
+            // Allotment details are specified. Determine if lease and sublease details should
+            // also be checked. 
+            if (!StringUtility.isEmpty(subleaseNumber) && !StringUtility.isEmpty(leaseNumber)) {
+                // Both lease and sublease details provided
+                WHERE("((ap.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} "
+                        + "AND ap.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "}) "
+                        + "OR (ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}) "
+                        + "OR (ap.sublease_number = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "}))");
+            } else if (!StringUtility.isEmpty(leaseNumber)) {
+                // Lease details provided
                 WHERE("((ap.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} "
                         + "AND ap.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "}) "
                         + "OR (ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}))");
+            } else if (!StringUtility.isEmpty(subleaseNumber)) {
+                // Sublease details provided
+                WHERE("((ap.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} "
+                        + "AND ap.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "}) "
+                        + "OR (ap.sublease_number = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "}))");
             } else {
+                // Only allotment details provided
                 WHERE("ap.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} "
                         + "AND ap.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "} ");
             }
         } else if (!StringUtility.isEmpty(leaseNumber)) {
-            WHERE("ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+            // Lease number supplied. Check sublease details
+            if (!StringUtility.isEmpty(subleaseNumber)) {
+                WHERE("((ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}) "
+                        + "OR (ap.sublease_number = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "}))");
+            } else {
+                // Only lease details provided. 
+                WHERE("ap.lease_number = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+            }
+        } else if (!StringUtility.isEmpty(subleaseNumber)) {
+            // Only sublease details provided. 
+            WHERE("ap.sublease_number = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} ");
         }
         sql = SQL();
         return sql;

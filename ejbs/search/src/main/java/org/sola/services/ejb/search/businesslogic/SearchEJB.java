@@ -220,12 +220,14 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      * @param lastPart The last part (i.e. Folio) of the allotment.
      * @param leaseNumber The lease number for the lease. Can be provided as an
      * alternative to the allotment details.
+     * @param subleaseNumber The sublease number for the sublease.
      */
     @Override
-    public PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart, String leaseNumber) {
+    public PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart,
+            String leaseNumber, String subleaseNumber) {
 
         if ((StringUtility.isEmpty(firstPart) || StringUtility.isEmpty(lastPart))
-                && StringUtility.isEmpty(leaseNumber)) {
+                && StringUtility.isEmpty(leaseNumber) && StringUtility.isEmpty(subleaseNumber)) {
             // No valid parameters to use for check. 
             return null;
         }
@@ -235,14 +237,21 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         }
 
         Map params = new HashMap<String, Object>();
-        params.put(CommonSqlProvider.PARAM_QUERY,
-                SearchSqlProvider.buildAllotmentVerifierSql(firstPart, lastPart, leaseNumber));
         params.put(PropertyVerifier.QUERY_PARAM_APPLICATION_NUMBER, applicationNumber);
         params.put(PropertyVerifier.QUERY_PARAM_FIRST_PART, firstPart);
         params.put(PropertyVerifier.QUERY_PARAM_LAST_PART, lastPart);
         params.put(PropertyVerifier.QUERY_PARAM_LEASE_NUM, leaseNumber);
-        // Validate the allotment details
-        AllotmentVerifier lot = getRepository().getEntity(AllotmentVerifier.class, params);
+        params.put(PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM, subleaseNumber);
+
+        AllotmentVerifier lot = null;
+        if ((!StringUtility.isEmpty(firstPart) && !StringUtility.isEmpty(lastPart))
+                || !StringUtility.isEmpty(leaseNumber)) {
+            // Validate the allotment details
+            params.remove(CommonSqlProvider.PARAM_QUERY);
+            params.put(CommonSqlProvider.PARAM_QUERY,
+                    SearchSqlProvider.buildAllotmentVerifierSql(firstPart, lastPart, leaseNumber));
+            lot = getRepository().getEntity(AllotmentVerifier.class, params);
+        }
 
         LeaseVerifier lease = null;
         if (!StringUtility.isEmpty(leaseNumber)) {
@@ -253,16 +262,26 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
             lease = getRepository().getEntity(LeaseVerifier.class, params);
         }
 
+        SubleaseVerifier sublease = null;
+        if (!StringUtility.isEmpty(subleaseNumber)) {
+            params.remove(CommonSqlProvider.PARAM_QUERY);
+            params.put(CommonSqlProvider.PARAM_QUERY,
+                    SearchSqlProvider.buildSubleaseVerifierSql(subleaseNumber,
+                    leaseNumber, firstPart, lastPart));
+            // Validate the sublease details
+            sublease = getRepository().getEntity(SubleaseVerifier.class, params);
+        }
+
         params.remove(CommonSqlProvider.PARAM_QUERY);
         params.put(CommonSqlProvider.PARAM_QUERY,
                 SearchSqlProvider.buildApplicationVerifierSql(applicationNumber,
-                firstPart, lastPart, leaseNumber));
+                firstPart, lastPart, leaseNumber, subleaseNumber));
         // Check if there are any applications using this allotment/lease info. 
         String apps = getRepository().getScalar(String.class, params);
 
         PropertyVerifier result = null;
-        if (lot != null || lease != null || apps != null) {
-            result = new PropertyVerifier(lease, lot, apps);
+        if (lot != null || lease != null || sublease != null || apps != null) {
+            result = new PropertyVerifier(lease, lot, sublease, apps);
         }
         return result;
     }

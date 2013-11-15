@@ -65,7 +65,6 @@ public class Rrr extends AbstractVersionedEntity {
     public static final String QUERY_WHERE_BYTRANSACTIONID = "transaction_id = "
             + "#{" + QUERY_PARAMETER_TRANSACTIONID + "}";
     public static final String QUERY_ORDER_BY = " status_code, nr ";
-    
     @Id
     @Column(name = "id")
     private String id;
@@ -110,6 +109,8 @@ public class Rrr extends AbstractVersionedEntity {
     @Column(name = "other_rightholder_name")
     @AccessFunctions(onSelect = "administrative.get_other_rightholder_name(id)")
     private String otherRightholderName;
+    @Column(name = "start_date")
+    private Date startDate;
     // Child entity fields
     @ChildEntity(insertBeforeParent = false, parentIdField = "rrrId")
     private BaUnitNotation notation;
@@ -126,8 +127,9 @@ public class Rrr extends AbstractVersionedEntity {
     @ChildEntityList(parentIdField = "rrrId", childIdField = "partyId",
             manyToManyClass = PartyForRrr.class, readOnly = true)
     private List<Party> rightHolderList;
-    @Column(insertable = false, updatable = false, name = "concatenated_name")
-    @AccessFunctions(onSelect = "administrative.get_concatenated_name(ba_unit_id)")
+    // AM Not used by Tonga
+   // @Column(insertable = false, updatable = false, name = "concatenated_name")
+   // @AccessFunctions(onSelect = "administrative.get_concatenated_name(ba_unit_id)")
     private String concatenatedName;
 
     public String getConcatenatedName() {
@@ -332,6 +334,14 @@ public class Rrr extends AbstractVersionedEntity {
 
     public void setOtherRightholderName(String otherRightholderName) {
         this.otherRightholderName = otherRightholderName;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
     public BaUnitNotation getNotation() {
