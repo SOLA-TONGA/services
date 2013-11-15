@@ -104,6 +104,7 @@ public class AdministrativeSqlProvider {
      */
     public static String buildPaymentHistorySql() {
         String sql;
+        // Get the current rrr details from the rrr table
         BEGIN();
         SELECT("r.id");
         SELECT("r.due_date");
@@ -121,6 +122,7 @@ public class AdministrativeSqlProvider {
         WHERE("(r.due_date IS NOT NULL OR r.receipt_date IS NOT NULL "
                 + "OR r.receipt_reference IS NOT NULL OR r.receipt_amount IS NOT NULL)");
         sql = SQL() + " UNION ";
+        // Get all historic records that are marked as Cashier Update
         SELECT("rh.id");
         SELECT("rh.due_date");
         SELECT("rh.receipt_date");
@@ -137,7 +139,49 @@ public class AdministrativeSqlProvider {
                 + " AND    rh.ba_unit_id = r2.ba_unit_id)");
         WHERE("(rh.due_date IS NOT NULL OR rh.receipt_date IS NOT NULL "
                 + "OR rh.receipt_reference IS NOT NULL OR rh.receipt_amount IS NOT NULL)");
-
+        sql += SQL() + " UNION ";
+        // Get the history record just prior to any cashier updates
+        // where the cashier update is on the rrr record
+        SELECT("rh.id");
+        SELECT("rh.due_date");
+        SELECT("rh.receipt_date");
+        SELECT("rh.receipt_reference");
+        SELECT("rh.receipt_amount");
+        SELECT("rh.cashier_update");
+        SELECT("rh.change_user");
+        FROM("administrative.rrr_historic rh");
+        WHERE("rh.cashier_update = FALSE");
+        WHERE("EXISTS "
+                + "(SELECT r2.id FROM administrative.rrr r2"
+                + " WHERE  r2.id = #{" + RrrPaymentHistory.QUERY_PARAMETER_ID + "}"
+                + " AND    rh.nr = r2.nr"
+                + " AND    rh.ba_unit_id = r2.ba_unit_id"
+                + " AND    r2.cashier_update = TRUE"
+                + " AND    r2.rowversion = (rh.rowversion + 1))");
+        WHERE("(rh.due_date IS NOT NULL OR rh.receipt_date IS NOT NULL "
+                + "OR rh.receipt_reference IS NOT NULL OR rh.receipt_amount IS NOT NULL)");
+        
+        sql += SQL() + " UNION ";
+        // Get the history record just prior to any cashier updates
+        // where the cashier update is on the rrr_historic record
+        SELECT("rh.id");
+        SELECT("rh.due_date");
+        SELECT("rh.receipt_date");
+        SELECT("rh.receipt_reference");
+        SELECT("rh.receipt_amount");
+        SELECT("rh.cashier_update");
+        SELECT("rh.change_user");
+        FROM("administrative.rrr_historic rh");
+        WHERE("rh.cashier_update = FALSE");
+        WHERE("EXISTS "
+                + "(SELECT rh2.id FROM administrative.rrr_historic rh2"
+                + " WHERE  rh2.id = #{" + RrrPaymentHistory.QUERY_PARAMETER_ID + "}"
+                + " AND    rh.nr = rh2.nr"
+                + " AND    rh.ba_unit_id = rh2.ba_unit_id"
+                + " AND    rh2.cashier_update = TRUE"
+                + " AND    rh2.rowversion = (rh.rowversion + 1))");
+        WHERE("(rh.due_date IS NOT NULL OR rh.receipt_date IS NOT NULL "
+                + "OR rh.receipt_reference IS NOT NULL OR rh.receipt_amount IS NOT NULL)");
         sql += SQL();
 
         return sql;
@@ -153,12 +197,13 @@ public class AdministrativeSqlProvider {
         FROM("administrative.rrr r");
         FROM("administrative.ba_unit b");
         WHERE("r.ba_unit_id = b.id");
-        WHERE("b.name_firstpart = #{" + CashierImport.QUERY_PARAMETER_LEASE_NUMBER + "}");
-        WHERE("r.type_code = 'lease'");
-        WHERE("r.status_code = b.status_code "
-                + "LIMIT 1");
+        WHERE("b.name = #{" + CashierImport.QUERY_PARAMETER_LEASE_NUMBER + "}");
+        WHERE("r.type_code IN ('lease', 'sublease')");
+        WHERE("r.status_code = b.status_code");
+        ORDER_BY("r.registration_date DESC");
 
         sql = SQL();
+        sql += " LIMIT 1";
 
         return sql;
     }

@@ -213,7 +213,7 @@ public class AdministrativeEJB extends AbstractEJB
      * Saves any updates to an existing BA Unit. Can also be used to create a
      * new BA Unit, however this method does not set any default values on the
      * BA Unit like null null null null null null null null null null null null
-     * null null null null null null null null null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
+     * null null null null null null null null null null null     {@linkplain #createBaUnit(java.lang.String, org.sola.services.ejb.administrative.repository.entities.BaUnit)
      * createBaUnit}. Will also create a new Transaction record for the BA Unit
      * if the Service is not already associated to a Transaction.
      *
@@ -779,6 +779,10 @@ public class AdministrativeEJB extends AbstractEJB
     public String saveCashierImport(List<CashierImport> cashierRecords) {
         String result = "";
         int count = 0;
+        if (cashierRecords == null || cashierRecords.size() < 1) {
+            return "No cashier to process.";
+        }
+
         Map params = new HashMap<String, Object>();
         params.put(CommonSqlProvider.PARAM_QUERY, AdministrativeSqlProvider.buildGetRrrIdByLeaseNumberSql());
         for (CashierImport rec : cashierRecords) {
