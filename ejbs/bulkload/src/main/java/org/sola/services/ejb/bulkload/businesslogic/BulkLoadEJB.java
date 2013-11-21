@@ -67,6 +67,7 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
     // Volalite variables accessed by multiple methods
     volatile String progressMessage;
     volatile int count;
+    volatile int skipCount;
     volatile long startTime;
     volatile int totalCount;
     volatile boolean cancelLoad = false;
@@ -130,6 +131,14 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
         }
         return result;
     }
+    
+    private String getFileName(String fileName) {
+        String result = "";
+        if (!StringUtility.isEmpty(fileName)) {
+            result = fileName.substring(fileName.lastIndexOf(";") + 1);
+        }
+        return result;
+    }
 
     /**
      * Determines the amount of time remaining before the load operation is
@@ -140,7 +149,7 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
         if (count > 0 && totalCount > 0 && startTime > 0) {
             long elapsed = (System.currentTimeMillis() - startTime) / 1000;
             double avgTime = elapsed / count;
-            int timeRemaining = (int) (avgTime * (totalCount - count));
+            int timeRemaining = (int) (avgTime * (totalCount - count) - skipCount);
             int hours = 0;
             int minutes = 0;
             result = "";
@@ -180,6 +189,7 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
     public String loadDocuments(String docType, String sourceFolder) {
         cancelLoad = false;
         count = 0;
+        skipCount = 0;
         totalCount = 0;
         progressMessage = "";
         FileMetaData current = null;
@@ -212,12 +222,12 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
                 }
                 // Check if the document already exists in the database based on the file name. 
                 params.remove(BulkLoadSqlProvider.QUERY_PARAM_DOCUMENT_NR);
-                params.put(BulkLoadSqlProvider.QUERY_PARAM_DOCUMENT_NR, file.getName());
+                params.put(BulkLoadSqlProvider.QUERY_PARAM_DOCUMENT_NR, getFileName(file.getName()));
                 if (getRepository().getScalar(String.class, params) == null) {
                     // Document does not already exist in the database, so load it
                     BulkDocument doc = new BulkDocument();
                     doc.setNr("");// SOLA Insert Mapper does not insert null values
-                    doc.setDescription(file.getName());
+                    doc.setDescription(getFileName(file.getName()));
                     doc.setExtension(FileUtility.getFileExtension(file.getName()));
                     // Determine the file name
                     String fileName = file.getName().replaceAll(File.pathSeparator, "/");
@@ -240,6 +250,7 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
                                 + " documents loaded. Est. time remaining " + calcTimeRemaining();
                     }
                 } else {
+                    skipCount++;
                     progressMessage += System.lineSeparator() + file.getName()
                             + " already loaded - skipping...";
                 }
