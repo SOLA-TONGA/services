@@ -54,6 +54,7 @@ public class ApplicationSearchResult extends AbstractReadOnlyEntity {
     public static final String QUERY_PARAM_CONTACT_NAME = "contactName";
     public static final String QUERY_PARAM_DOCUMENT_NUMBER = "documentNumber";
     public static final String QUERY_PARAM_DOCUMENT_REFERENCE = "documentRef";
+    public static final String QUERY_PARAM_ITEM_NUMBER = "itemNumber";
     public static final String QUERY_FROM =
             "(application.application a LEFT JOIN application.application_status_type ast on a.status_code = ast.code) "
             + "LEFT JOIN system.appuser u ON a.assignee_id = u.id "
@@ -72,6 +73,8 @@ public class ApplicationSearchResult extends AbstractReadOnlyEntity {
             "a.lodging_datetime BETWEEN #{" + QUERY_PARAM_FROM_LODGE_DATE + "} AND #{" + QUERY_PARAM_TO_LODGE_DATE + "} "
             + "AND (CASE WHEN #{" + QUERY_PARAM_APP_NR + "} = '' THEN true ELSE "
             + "compare_strings(#{" + QUERY_PARAM_APP_NR + "}, a.nr) END) "
+            + "AND (CASE WHEN #{" + QUERY_PARAM_ITEM_NUMBER + "} = '' THEN true ELSE "
+            + "compare_strings(#{" + QUERY_PARAM_ITEM_NUMBER + "}, a.item_number) END) "
             + "AND (CASE WHEN #{" + QUERY_PARAM_CONTACT_NAME + "} = '' THEN true ELSE "
             + "compare_strings(#{" + QUERY_PARAM_CONTACT_NAME + "}, COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')) END) "
             + "AND (CASE WHEN #{" + QUERY_PARAM_AGENT_NAME + "} = '' THEN true ELSE "
@@ -115,6 +118,8 @@ public class ApplicationSearchResult extends AbstractReadOnlyEntity {
     private String agentId;
     @Column(name = "contact_person_id")
     private String contactPersonId;
+    @Column (name = "item_number")
+    private String itemNumber;
 //    @AccessFunctions(onSelect = "(SELECT string_agg(tmp.display_value, ',') FROM "
 //    + " (SELECT get_translation(display_value, #{" + CommonSqlProvider.PARAM_LANGUAGE_CODE + "}) as display_value "
 //    + "  FROM application.service aps INNER JOIN application.request_type rt ON aps.request_type_code = rt.code "
@@ -277,5 +282,13 @@ public class ApplicationSearchResult extends AbstractReadOnlyEntity {
 
     public void setRowVersion(int rowVersion) {
         this.rowVersion = rowVersion;
+    }
+    
+    public String getItemNumber(){
+        return itemNumber;
+    }
+    
+    public void setItemNumber(String itemNumber){
+        this.itemNumber = itemNumber;
     }
 }

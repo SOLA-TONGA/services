@@ -314,6 +314,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
                 params.getAgent() == null ? "" : params.getAgent().trim());
         queryParams.put(ApplicationSearchResult.QUERY_PARAM_APP_NR,
                 params.getNr() == null ? "" : params.getNr().trim());
+        queryParams.put(ApplicationSearchResult.QUERY_PARAM_ITEM_NUMBER,
+                params.getItemNumber() == null ? "" : params.getItemNumber().trim());
         queryParams.put(ApplicationSearchResult.QUERY_PARAM_FROM_LODGE_DATE,
                 params.getFromDate() == null ? new GregorianCalendar(1, 1, 1).getTime() : params.getFromDate());
         queryParams.put(ApplicationSearchResult.QUERY_PARAM_TO_LODGE_DATE,
