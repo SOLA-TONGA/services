@@ -87,6 +87,10 @@ public class Service extends AbstractVersionedEntity {
     private Date approvalDate;
     @Column(name = "approval_number")
     private String approvalNumber;
+    @Column(name = "report_text_one")
+    private String reportTextOne;
+    @Column(name = "report_text_two")
+    private String reportTextTwo;
 
     public Service() {
         super();
@@ -227,6 +231,22 @@ public class Service extends AbstractVersionedEntity {
     
     public void setApprovalNumber(String approvalNumber){
         this.approvalNumber = approvalNumber;
+    }
+    
+    public String getReportTextOne() {
+        return reportTextOne;
+    }
+
+    public void setReportTextOne(String reportTextOne) {
+        this.reportTextOne = reportTextOne;
+    }
+
+    public String getReportTextTwo() {
+        return reportTextTwo;
+    }
+
+    public void setReportTextTwo(String reportTextTwo) {
+        this.reportTextTwo = reportTextTwo;
     }
     
 }
