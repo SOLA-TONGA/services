@@ -111,6 +111,8 @@ public class Rrr extends AbstractVersionedEntity {
     private String otherRightholderName;
     @Column(name = "start_date")
     private Date startDate;
+    @Column(name = "rrr_ref")
+    private String rrrReference;
     // Child entity fields
     @ChildEntity(insertBeforeParent = false, parentIdField = "rrrId")
     private BaUnitNotation notation;
@@ -294,6 +296,14 @@ public class Rrr extends AbstractVersionedEntity {
 
     public void setRegistryBookReference(String registryBookReference) {
         this.registryBookReference = registryBookReference;
+    }
+
+    public String getRrrReference() {
+        return rrrReference;
+    }
+
+    public void setRrrReference(String rrrReference) {
+        this.rrrReference = rrrReference;
     }
 
     public BigDecimal getTerm() {
