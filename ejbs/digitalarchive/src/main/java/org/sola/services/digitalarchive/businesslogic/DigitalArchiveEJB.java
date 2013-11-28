@@ -460,8 +460,9 @@ public class DigitalArchiveEJB extends AbstractEJB implements DigitalArchiveEJBL
     @Override
     @RolesAllowed(RolesConstants.SOURCE_SEARCH)
     public List<FileInfo> getAllFiles() {
-        List<FileMetaData> fileInfoList = scanFolder.getAllFiles(
-                ".*pdf$|.*png$|.*jpg$|.*jpeg$|.*tif$|.*tiff$");
+//        List<FileMetaData> fileInfoList = scanFolder.getAllFiles(
+//                ".*pdf$|.*png$|.*jpg$|.*jpeg$|.*tif$|.*tiff$");
+        List<FileMetaData> fileInfoList = scanFolder.getAllFiles(null);
 
         List<FileInfo> result = new ArrayList<FileInfo>();
         MappingUtility.translateList(fileInfoList, result, FileInfo.class, MappingManager.getMapper());
