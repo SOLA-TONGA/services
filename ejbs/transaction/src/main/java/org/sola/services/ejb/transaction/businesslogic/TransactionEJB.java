@@ -234,11 +234,12 @@ public class TransactionEJB extends AbstractEJB implements TransactionEJBLocal {
                     RegistrationStatusType.STATUS_HISTORIC);
         }
         if (requestType.equals(TransactionType.CADASTRE_CHANGE)
-                || requestType.equals(TransactionType.NEW_APARTMENT)
-                || requestType.equals(TransactionType.NEW_DIGITAL_PROPERTY)
-                || requestType.equals(TransactionType.NEW_DIGITAL_TITLE)
-                || requestType.equals(TransactionType.NEW_FREEHOLD)
-                || requestType.equals(TransactionType.NEW_STATE)) {
+                || requestType.equals(TransactionType.CODE_CORRECT_REGISTRY)
+                || requestType.equals(TransactionType.CODE_CORRECT_REGISTRY_REMOVE)
+                || requestType.equals(TransactionType.CODE_REGISTER_LEASE)
+                || requestType.equals(TransactionType.CODE_REGISTER_SUBLEASE)
+                || requestType.equals(TransactionType.CODE_REGISTER_TAX_API)
+                || requestType.equals(TransactionType.CODE_REGISTER_TOWN_API)) {
             cadastreEJB.ChangeStatusOfCadastreObjects(
                     transactionId,
                     CadastreObjectStatusChanger.QUERY_WHERE_SEARCHBYTRANSACTION_PENDING,
