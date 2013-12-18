@@ -1,28 +1,30 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
- * All rights reserved.
+ * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations
+ * (FAO). All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *    1. Redistributions of source code must retain the above copyright notice,this list
- *       of conditions and the following disclaimer.
- *    2. Redistributions in binary form must reproduce the above copyright notice,this list
- *       of conditions and the following disclaimer in the documentation and/or other
- *       materials provided with the distribution.
- *    3. Neither the name of FAO nor the names of its contributors may be used to endorse or
- *       promote products derived from this software without specific prior written permission.
+ * 1. Redistributions of source code must retain the above copyright notice,this
+ * list of conditions and the following disclaimer. 2. Redistributions in binary
+ * form must reproduce the above copyright notice,this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution. 3. Neither the name of FAO nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,STRICT LIABILITY,OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT,STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
 /*
@@ -418,7 +420,7 @@ public class SearchSqlProvider {
         if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)
                 || params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
             // Retrieve the island details
-            SELECT("(SELECT string_agg(i1.name_firstpart, ',') "
+            SELECT("(SELECT string_agg(i1.name_firstpart, ', ') "
                     + "FROM administrative.ba_unit i1, "
                     + "     administrative.required_relationship_baunit req1 "
                     + "WHERE req1.to_ba_unit_id = prop.id "
@@ -426,7 +428,7 @@ public class SearchSqlProvider {
                     + "AND i1.id = req1.from_ba_unit_id ) AS island_name");
         } else {
             // Retrieve the town details
-            SELECT("(SELECT string_agg(t1.name_firstpart, ',') "
+            SELECT("(SELECT string_agg(t1.name_firstpart, ', ') "
                     + "FROM administrative.ba_unit t1, "
                     + "     administrative.required_relationship_baunit req1 "
                     + "WHERE req1.to_ba_unit_id = prop.id "
@@ -439,7 +441,7 @@ public class SearchSqlProvider {
             SELECT("prop.status_code");
         } else {
             // Caputre fields required for all but town searches
-            SELECT("(SELECT string_agg(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, ''), ',') "
+            SELECT("(SELECT string_agg(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, ''), ', ') "
                     + "FROM administrative.party_for_rrr pr1, party.party p1 "
                     + "WHERE pr1.rrr_id = rrr.id "
                     + "AND p1.id = pr1.party_id ) AS rightholders");
@@ -467,6 +469,13 @@ public class SearchSqlProvider {
             SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
             WHERE("prop.type_code = 'subleaseUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
+             // Retrieve the estate name details
+            SELECT("(SELECT string_agg(co.name_firstpart, ', ') "
+                    + "FROM administrative.ba_unit_contains_spatial_unit bas, "
+                    + "cadastre.cadastre_object co "
+                    + "WHERE bas.ba_unit_id = prop.id "
+                    + "AND co.id = bas.spatial_unit_id "
+                    + "AND co.type_code = 'estate' ) AS estate_name");
             WHERE("prop.type_code = 'estateUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
             WHERE("prop.type_code IN ('townUnit', 'islandUnit')");
@@ -545,6 +554,17 @@ public class SearchSqlProvider {
                     + "WHERE req.to_ba_unit_id = prop.id "
                     + "AND req.from_ba_unit_id = #{" + BaUnitSearchResult.QUERY_PARAM_ISLAND + "} "
                     + "AND req.relation_code = 'island')");
+        }
+
+        if (!StringUtility.isEmpty(params.getEstateName())) {
+            WHERE("EXISTS (SELECT bas.ba_unit_id "
+                    + "FROM administrative.ba_unit_contains_spatial_unit bas, "
+                    + "cadastre.cadastre_object co "
+                    + "WHERE bas.ba_unit_id = prop.id "
+                    + "AND co.id = bas.spatial_unit_id "
+                    + "AND co.type_code = 'estate' "
+                    + "AND compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_ESTATE_NAME
+                        + "}, COALESCE(co.name_firstpart, '')))");
         }
         ORDER_BY(BaUnitSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");

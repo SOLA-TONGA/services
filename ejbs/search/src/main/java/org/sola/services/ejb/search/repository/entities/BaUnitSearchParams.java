@@ -52,6 +52,7 @@ public class BaUnitSearchParams extends AbstractEntity {
     private String otherRightholder;
     private String townId;
     private String islandId;
+    private String estateName;
 
     public BaUnitSearchParams() {
         super();
@@ -168,7 +169,7 @@ public class BaUnitSearchParams extends AbstractEntity {
     public void setIslandId(String islandId) {
         this.islandId = islandId;
     }
-
+      
     /**
      * Returns the query parameter for the Registry Book Reference value
      * including special space delimiter characters to ensure a more accurate
@@ -191,4 +192,13 @@ public class BaUnitSearchParams extends AbstractEntity {
     public boolean isSearchType(String searchType) {
         return searchType.equals(getSearchType());
     }
+
+    public String getEstateName() {
+        return estateName;
+    }
+
+    public void setEstateName(String estateName) {
+        this.estateName = estateName;
+    }
+    
 }

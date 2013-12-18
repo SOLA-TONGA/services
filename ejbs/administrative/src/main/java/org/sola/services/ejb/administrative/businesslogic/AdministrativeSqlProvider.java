@@ -53,10 +53,11 @@ public class AdministrativeSqlProvider {
         SELECT("ba.name_firstpart AS display_value");
         SELECT("NULL AS description");
         SELECT("CASE WHEN ba.status_code = 'current' THEN 'c' ELSE 'x' END AS status");
-        SELECT("ba_rel.from_ba_unit_id AS island_id");
-        FROM("administrative.ba_unit ba "
-                + " LEFT OUTER JOIN administrative.required_relationship_baunit ba_rel "
-                + " ON ba_rel.to_ba_unit_id = ba.id AND ba_rel.relation_code = 'island'");
+        SELECT("(SELECT string_agg(req1.from_ba_unit_id, '|') "
+                    + "FROM administrative.required_relationship_baunit req1 "
+                    + "WHERE req1.to_ba_unit_id = ba.id "
+                    + "AND req1.relation_code = 'island' ) AS island_id");
+        FROM("administrative.ba_unit ba");
         WHERE("ba.type_code = 'estateUnit'");
         ORDER_BY("ba.name_firstpart");
         sql = SqlBuilder.SQL();
