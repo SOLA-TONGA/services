@@ -38,6 +38,7 @@ public class BaUnitSearchParams extends AbstractEntity {
     public static final String SEARCH_TYPE_SUBLEASE = "sublease";
     public static final String SEARCH_TYPE_ESTATE = "estate";
     public static final String SEARCH_TYPE_TOWN = "town";
+    public static final String SEARCH_TYPE_MORTGAGE = "mortgage";
     private String nameFirstPart;
     private String nameLastPart;
     private String ownerName;
@@ -53,6 +54,7 @@ public class BaUnitSearchParams extends AbstractEntity {
     private String townId;
     private String islandId;
     private String estateName;
+    private String rrrRef;
 
     public BaUnitSearchParams() {
         super();
@@ -199,6 +201,14 @@ public class BaUnitSearchParams extends AbstractEntity {
 
     public void setEstateName(String estateName) {
         this.estateName = estateName;
+    }
+
+    public String getRrrRef() {
+        return rrrRef;
+    }
+
+    public void setRrrRef(String rrrRef) {
+        this.rrrRef = rrrRef;
     }
     
 }

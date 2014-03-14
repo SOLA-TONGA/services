@@ -45,6 +45,7 @@ public class BaUnitSearchResult extends AbstractReadOnlyEntity {
     public static final String QUERY_PARAM_ISLAND = "island";
     public static final String QUERY_PARAM_OTHER_RIGHTHOLDER = "otherRightholder";
     public static final String QUERY_PARAM_ESTATE_NAME = "estateName";
+    public static final String QUERY_PARAM_RRR_REF = "rrrRef";
     public static final String QUERY_ORDER_BY = "prop.name_firstpart, prop.name_lastpart";
     @Id
     @Column
@@ -77,6 +78,8 @@ public class BaUnitSearchResult extends AbstractReadOnlyEntity {
     private String rrrTypeCode;
     @Column(name = "estate_name")
     private String estateName;
+    @Column(name = "rrr_ref")
+    private String rrrRef;
 
     public BaUnitSearchResult() {
         super();
@@ -200,5 +203,13 @@ public class BaUnitSearchResult extends AbstractReadOnlyEntity {
 
     public void setEstateName(String estateName) {
         this.estateName = estateName;
+    }
+
+    public String getRrrRef() {
+        return rrrRef;
+    }
+
+    public void setRrrRef(String rrrRef) {
+        this.rrrRef = rrrRef;
     }
 }

@@ -1,28 +1,30 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
- * All rights reserved.
+ * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations
+ * (FAO). All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *    1. Redistributions of source code must retain the above copyright notice,this list
- *       of conditions and the following disclaimer.
- *    2. Redistributions in binary form must reproduce the above copyright notice,this list
- *       of conditions and the following disclaimer in the documentation and/or other
- *       materials provided with the distribution.
- *    3. Neither the name of FAO nor the names of its contributors may be used to endorse or
- *       promote products derived from this software without specific prior written permission.
+ * 1. Redistributions of source code must retain the above copyright notice,this
+ * list of conditions and the following disclaimer. 2. Redistributions in binary
+ * form must reproduce the above copyright notice,this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution. 3. Neither the name of FAO nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,STRICT LIABILITY,OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT,STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
 /*
@@ -72,8 +74,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private String leaseNumber;
     @Column(name = "lease_term")
     private BigDecimal leaseTerm;
-    @Column(name = "lease_area")
-    private BigDecimal leaseArea;
     @Column(name = "amount")
     private BigDecimal amount;
     @Column(name = "registration_date")
@@ -90,16 +90,18 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private String townId;
     @Column(name = "lessee_name")
     private String lesseeName;
-    @Column(name = "lease_linked")
-    private boolean leaseLinked;
     @Column(name = "lease_ba_unit_id")
     private String leaseBaUnitId;
     @Column(name = "sublease_number")
     private String subleaseNumber;
-    @Column(name = "sublease_linked")
-    private boolean subleaseLinked;
     @Column(name = "sublease_ba_unit_id")
     private String subleaseBaUnitId;
+    @Column(name = "sublessee_name")
+    private String sublesseeName;
+    @Column(name = "registered_name")
+    private String registeredName;
+    @Column(name = "type_code")
+    private String typeCode;
 
     public ApplicationProperty() {
         super();
@@ -202,14 +204,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.leaseTerm = leaseTerm;
     }
 
-    public BigDecimal getLeaseArea() {
-        return leaseArea;
-    }
-
-    public void setLeaseArea(BigDecimal leaseArea) {
-        this.leaseArea = leaseArea;
-    }
-
     public BigDecimal getAmount() {
         return amount;
     }
@@ -274,14 +268,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.lesseeName = lesseeName;
     }
 
-    public boolean isLeaseLinked() {
-        return leaseLinked;
-    }
-
-    public void setLeaseLinked(boolean leaseLinked) {
-        this.leaseLinked = leaseLinked;
-    }
-
     public String getLeaseBaUnitId() {
         return leaseBaUnitId;
     }
@@ -298,19 +284,35 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.subleaseNumber = subleaseNumber;
     }
 
-    public boolean isSubleaseLinked() {
-        return subleaseLinked;
-    }
-
-    public void setSubleaseLinked(boolean subleaseLinked) {
-        this.subleaseLinked = subleaseLinked;
-    }
-
     public String getSubleaseBaUnitId() {
         return subleaseBaUnitId;
     }
 
     public void setSubleaseBaUnitId(String subleaseBaUnitId) {
         this.subleaseBaUnitId = subleaseBaUnitId;
+    }
+
+    public String getSublesseeName() {
+        return sublesseeName;
+    }
+
+    public void setSublesseeName(String sublesseeName) {
+        this.sublesseeName = sublesseeName;
+    }
+
+    public String getRegisteredName() {
+        return registeredName;
+    }
+
+    public void setRegisteredName(String registeredName) {
+        this.registeredName = registeredName;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public void setTypeCode(String typeCode) {
+        this.typeCode = typeCode;
     }
 }

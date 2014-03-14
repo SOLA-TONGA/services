@@ -46,6 +46,7 @@ public class BaUnitType extends AbstractCodeEntity {
     public static final String CODE_ESTATE_UNIT = "estateUnit";
     public static final String CODE_TOWN_UNIT = "townUnit";
     public static final String CODE_ISLAND_UNIT = "islandUnit";
+    public static final String CODE_SUBLEASE_UNIT = "subleaseUnit";
 
     public BaUnitType() {
         super();

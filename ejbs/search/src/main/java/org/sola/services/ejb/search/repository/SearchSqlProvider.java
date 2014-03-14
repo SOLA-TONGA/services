@@ -33,6 +33,7 @@
  */
 package org.sola.services.ejb.search.repository;
 
+import org.apache.ibatis.jdbc.SqlBuilder;
 import static org.apache.ibatis.jdbc.SqlBuilder.*;
 import org.sola.common.StringUtility;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchParams;
@@ -399,9 +400,9 @@ public class SearchSqlProvider {
     }
 
     /**
-     * Uses the BA Unit Search parameters to build an SQL Query for Allotments.
-     * This method does not inject the search parameter values into the SQL as
-     * that would prevent the database from performing statement caching.
+     * Uses the BA Unit Search parameters to build an SQL Query for various BA
+     * Units. This method does not inject the search parameter values into the
+     * SQL as that would prevent the database from performing statement caching.
      *
      * @param params Object containing the parameter values provided by the user
      * @return SQL String
@@ -449,6 +450,7 @@ public class SearchSqlProvider {
             SELECT("rrr.registration_date");
             // Show the status code of the rrr instead of the property
             SELECT("rrr.status_code");
+            SELECT("rrr.rrr_ref");
             SELECT("rrr.type_code as rrr_type_code");
             FROM("administrative.rrr rrr");
             WHERE("rrr.ba_unit_id = prop.id");
@@ -469,7 +471,7 @@ public class SearchSqlProvider {
             SELECT("administrative.get_other_rightholder_name(rrr.id) AS other_rightholders");
             WHERE("prop.type_code = 'subleaseUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_ESTATE)) {
-             // Retrieve the estate name details
+            // Retrieve the estate name details
             SELECT("(SELECT string_agg(co.name_firstpart, ', ') "
                     + "FROM administrative.ba_unit_contains_spatial_unit bas, "
                     + "cadastre.cadastre_object co "
@@ -479,6 +481,11 @@ public class SearchSqlProvider {
             WHERE("prop.type_code = 'estateUnit'");
         } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_TOWN)) {
             WHERE("prop.type_code IN ('townUnit', 'islandUnit')");
+        } else if (params.isSearchType(BaUnitSearchParams.SEARCH_TYPE_MORTGAGE)) {
+            // Mortgage search so match on mortgage RRR's. Exclude previous
+            // as this will just result in duplicate results. 
+            WHERE("rrr.status_code NOT IN ('previous')");
+            WHERE("rrr.type_code = 'mortgage'");
         } else {
             // Allotment search
             if (params.isTaxAllotment() == params.isTownAllotment()) {
@@ -564,7 +571,12 @@ public class SearchSqlProvider {
                     + "AND co.id = bas.spatial_unit_id "
                     + "AND co.type_code = 'estate' "
                     + "AND compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_ESTATE_NAME
-                        + "}, COALESCE(co.name_firstpart, '')))");
+                    + "}, COALESCE(co.name_firstpart, '')))");
+        }
+
+        if (!StringUtility.isEmpty(params.getRrrRef())) {
+            WHERE("compare_strings(#{" + BaUnitSearchResult.QUERY_PARAM_RRR_REF
+                    + "}, COALESCE(rrr.rrr_ref, ''))");
         }
         ORDER_BY(BaUnitSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
@@ -627,22 +639,19 @@ public class SearchSqlProvider {
      * Builds a SQL string to retrieve property information. Used to verify if
      * the allotment details entered for a new application match details in the
      * database. Customization for Tonga.
-     *
-     * @param appNumber The number for the new application the property details
-     * will be associated with.
-     * @param nameFirstPart The deed number of the allotment
-     * @param nameLastPart The folio of the allotment
-     * @param leaseNumber The lease number for the lease
      */
-    public static String buildAllotmentVerifierSql(String nameFirstPart,
-            String nameLastPart, String leaseNumber) {
+    public static String buildAllotmentVerifierSql() {
         String sql;
 
         // Retrieve details about the allotment
         BEGIN();
         SELECT("b.id AS lot_id");
+        SELECT("b.type_code AS type_code");
         SELECT("b.name_firstpart AS deed_num");
         SELECT("b.name_lastpart AS folio");
+        SELECT("b.registered_name AS parcel_name");
+        SELECT("b.land_use_code AS land_use_code");
+        SELECT("b.creation_date AS reg_date");
         SELECT("(SELECT string_agg(TRIM(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')), ', ') "
                 + "FROM administrative.rrr r, administrative.party_for_rrr pfr, party.party p "
                 + "WHERE r.ba_unit_id = b.id "
@@ -653,56 +662,30 @@ public class SearchSqlProvider {
         SELECT("(SELECT ba.size "
                 + "FROM administrative.ba_unit_area ba "
                 + "WHERE ba.ba_unit_id = b.id "
-                + "AND ba.type_code = 'officialArea') AS lot_area");
-        SELECT("b.creation_date AS reg_date");
-        SELECT("(SELECT co.land_use_code "
-                + "FROM cadastre.cadastre_object co, "
-                + "     administrative.ba_unit_contains_spatial_unit bas "
-                + "WHERE co.id = bas.spatial_unit_id "
-                + "AND bas.ba_unit_id = b.id "
-                + "AND co.status_code = 'current') AS land_use_code");
-        SELECT("(SELECT island.from_ba_unit_id "
+                + "AND ba.type_code = 'officialArea') AS area");
+        SELECT("(SELECT district.from_ba_unit_id "
                 + "FROM administrative.required_relationship_baunit  town, "
-                + "     administrative.required_relationship_baunit island "
+                + "     administrative.required_relationship_baunit district "
                 + "WHERE town.to_ba_unit_id = b.id "
                 + "AND town.relation_code = 'town' "
-                + "AND island.to_ba_unit_id = town.from_ba_unit_id "
-                + "AND island.relation_code = 'island') AS island_id");
+                + "AND district.to_ba_unit_id = town.from_ba_unit_id "
+                + "AND district.relation_code = 'island') AS district_id");
         SELECT("(SELECT ba_rel.from_ba_unit_id "
                 + "FROM administrative.required_relationship_baunit  ba_rel "
                 + "WHERE ba_rel.to_ba_unit_id = b.id "
                 + "AND ba_rel.relation_code = 'town') AS town_id");
+        SELECT("(SELECT ba_rel.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  ba_rel "
+                + "WHERE ba_rel.to_ba_unit_id = b.id "
+                + "AND ba_rel.relation_code = 'estate') AS estate_id");
         FROM("administrative.ba_unit b");
         WHERE("b.status_code = 'current'");
         WHERE("b.type_code IN ('townAllotmentUnit', 'taxUnit') ");
+        // Use the deed number and folio for the criteria
+        WHERE("b.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} ");
+        WHERE("b.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "} ");
 
-        if (!StringUtility.isEmpty(nameFirstPart) && !StringUtility.isEmpty(nameLastPart)) {
-            if (!StringUtility.isEmpty(leaseNumber)) {
-                // Check if the lease is linked to the allotment
-                SELECT("COALESCE((SELECT (lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}) "
-                        + "FROM administrative.required_relationship_baunit lease_rel,"
-                        + "     administrative.ba_unit lease "
-                        + "WHERE lease_rel.from_ba_unit_id = b.id "
-                        + "AND lease_rel.relation_code = 'allotment' "
-                        + "AND lease.id = lease_rel.to_ba_unit_id "
-                        + "AND lease.type_code = 'leasedUnit' "
-                        + "AND lease.status_code = 'current'), false) AS lease_linked");
-            }
-            // Use the deed number and folio for the criteria
-            WHERE("b.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} ");
-            WHERE("b.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "} ");
-        } else if (!StringUtility.isEmpty(leaseNumber)) {
-            // Use the lease number if the deed number and folio are not provided. 
-            SELECT("true AS lease_linked");
-            FROM("administrative.ba_unit lease ");
-            FROM("administrative.required_relationship_baunit rel");
-            WHERE("lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
-            WHERE("lease.type_code = 'leasedUnit'");
-            WHERE("lease.status_code = 'current'");
-            WHERE("rel.to_ba_unit_id = lease.id");
-            WHERE("rel.relation_code = 'allotment'");
-            WHERE("b.id = rel.from_ba_unit_id");
-        }
+
         sql = SQL();
         return sql;
     }
@@ -712,26 +695,81 @@ public class SearchSqlProvider {
      * the lease details entered for a new application match details in the
      * database. Customization for Tonga.
      *
-     * @param leaseNumber The lease number for the lease
+     * @param deedNum The deed number of the allotment
+     * @param folio The folio of the allotment
      */
-    public static String buildLeaseVerifierSql(String leaseNumber) {
+    public static String buildLeaseVerifierSql() {
         String sql;
 
-        // Retrieve details about the lease
+        // Create a temporary table to retreive allotment details using WITH
+        BEGIN();
+        SELECT("#{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} AS link ");
+        SELECT("ba.id AS lot_id");
+        SELECT("ba.name_firstpart AS deed_num");
+        SELECT("ba.name_lastpart AS folio");
+        SELECT("(SELECT string_agg(TRIM(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, '')), ', ') "
+                + "FROM administrative.rrr r1, administrative.party_for_rrr pfr1, party.party p1 "
+                + "WHERE r1.ba_unit_id = ba.id "
+                + "AND r1.status_code = 'current' "
+                + "AND r1.type_code = 'ownership' "
+                + "AND pfr1.rrr_id = r1.id "
+                + "AND p1.id = pfr1.party_id ) AS holder_name");
+        FROM("administrative.ba_unit ba");
+        WHERE("ba.status_code = 'current'");
+        WHERE("ba.type_code IN ('townAllotmentUnit', 'taxUnit') ");
+
+        // Use the lease number to determine the allotment details if the lease
+        // has an association to an allotment. 
+        FROM("administrative.ba_unit lease ");
+        FROM("administrative.required_relationship_baunit rel");
+        WHERE("lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+        WHERE("lease.type_code = 'leasedUnit'");
+        WHERE("lease.status_code = 'current'");
+        WHERE("rel.to_ba_unit_id = lease.id");
+        WHERE("rel.relation_code = 'allotment'");
+        WHERE("ba.id = rel.from_ba_unit_id");
+
+        sql = "WITH lot AS (" + SQL() + ") ";
+
+        // Primary query for checking lease details
         BEGIN();
         SELECT("b.id AS lease_id");
+        SELECT("b.type_code AS type_code");
         SELECT("b.name_firstpart AS lease_num");
+        SELECT("b.land_use_code AS land_use_code");
         SELECT("(SELECT string_agg(TRIM(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')), ', ') "
-                + "FROM administrative.party_for_rrr pfr, party.party p "
-                + "WHERE pfr.rrr_id = r.id "
+                + "FROM administrative.rrr r, administrative.party_for_rrr pfr, party.party p "
+                + "WHERE r.ba_unit_id = b.id "
+                + "AND r.status_code = 'current' "
+                + "AND r.type_code = 'lease' "
+                + "AND pfr.rrr_id = r.id "
                 + "AND p.id = pfr.party_id ) AS lessee_name");
         SELECT("(SELECT ba.size "
                 + "FROM administrative.ba_unit_area ba "
                 + "WHERE ba.ba_unit_id = b.id "
-                + "AND ba.type_code = 'officialArea') AS lease_area");
+                + "AND ba.type_code = 'officialArea') AS area");
+        SELECT("(SELECT district.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  town, "
+                + "     administrative.required_relationship_baunit district "
+                + "WHERE town.to_ba_unit_id = b.id "
+                + "AND town.relation_code = 'town' "
+                + "AND district.to_ba_unit_id = town.from_ba_unit_id "
+                + "AND district.relation_code = 'island') AS district_id");
+        SELECT("(SELECT ba_rel.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  ba_rel "
+                + "WHERE ba_rel.to_ba_unit_id = b.id "
+                + "AND ba_rel.relation_code = 'town') AS town_id");
+        SELECT("(SELECT ba_rel.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  ba_rel "
+                + "WHERE ba_rel.to_ba_unit_id = b.id "
+                + "AND ba_rel.relation_code = 'estate') AS estate_id");
         SELECT("r.term AS term");
         SELECT("r.amount AS rental");
-        FROM("administrative.ba_unit b");
+        SELECT("lot.lot_id");
+        SELECT("lot.deed_num");
+        SELECT("lot.folio");
+        SELECT("lot.holder_name");
+        FROM("administrative.ba_unit b LEFT OUTER JOIN lot ON b.name_firstpart = lot.link");
         FROM("administrative.rrr r");
         WHERE("b.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
         WHERE("b.type_code = 'leasedUnit'");
@@ -739,7 +777,8 @@ public class SearchSqlProvider {
         WHERE("r.ba_unit_id = b.id");
         WHERE("r.status_code = 'current'");
         WHERE("r.type_code = 'lease'");
-        sql = SQL();
+
+        sql += SQL();
 
         return sql;
     }
@@ -748,17 +787,112 @@ public class SearchSqlProvider {
      * Builds a SQL string to retrieve property information. Used to verify if
      * the sublease details entered for a new application match details in the
      * database. Customization for Tonga.
-     *
-     * @param subleaseNumber The sublease number for the sublease
      */
-    public static String buildSubleaseVerifierSql(String subleaseNumber, String leaseNumber,
-            String nameFirstPart, String nameLastPart) {
+    public static String buildSubleaseVerifierSql() {
         String sql;
 
-        // Retrieve details about the lease
+        // Create a temporary table to retreive allotment details using WITH
+        BEGIN();
+        SELECT("#{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} AS link ");
+        SELECT("ba.id AS lot_id");
+        SELECT("ba.name_firstpart AS deed_num");
+        SELECT("ba.name_lastpart AS folio");
+        SELECT("(SELECT string_agg(TRIM(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, '')), ', ') "
+                + "FROM administrative.rrr r1, administrative.party_for_rrr pfr1, party.party p1 "
+                + "WHERE r1.ba_unit_id = ba.id "
+                + "AND r1.status_code = 'current' "
+                + "AND r1.type_code = 'ownership' "
+                + "AND pfr1.rrr_id = r1.id "
+                + "AND p1.id = pfr1.party_id ) AS holder_name");
+        FROM("administrative.ba_unit ba");
+        WHERE("ba.status_code = 'current'");
+        WHERE("ba.type_code IN ('townAllotmentUnit', 'taxUnit') ");
+
+        // Use the lease number to determine the allotment details if the lease
+        // has an association to an allotment. 
+        FROM("administrative.ba_unit lease ");
+        FROM("administrative.required_relationship_baunit rel");
+        WHERE("lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "} ");
+        WHERE("lease.type_code = 'leasedUnit'");
+        WHERE("lease.status_code = 'current'");
+        WHERE("rel.to_ba_unit_id = lease.id");
+        WHERE("rel.relation_code = 'sublease'");
+        WHERE("ba.id = rel.from_ba_unit_id");
+
+        sql = "WITH lot AS (" + SqlBuilder.SQL() + ") ";
+
+        // Create a temporary table to retreive lease details using WITH
+        BEGIN();
+        SELECT("#{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} AS link ");
+        SELECT("ba.id AS lease_id");
+        SELECT("ba.name_firstpart AS lease_num");
+        SELECT("(SELECT string_agg(TRIM(COALESCE(p1.name, '') || ' ' || COALESCE(p1.last_name, '')), ', ') "
+                + "FROM administrative.rrr r1, administrative.party_for_rrr pfr1, party.party p1 "
+                + "WHERE r1.ba_unit_id = ba.id "
+                + "AND r1.status_code = 'current' "
+                + "AND r1.type_code = 'lease' "
+                + "AND pfr1.rrr_id = r1.id "
+                + "AND p1.id = pfr1.party_id ) AS lessee_name");
+        FROM("administrative.ba_unit ba");
+        WHERE("ba.status_code = 'current'");
+        WHERE("ba.type_code = 'leasedUnit' ");
+
+        // Use the lease number to determine the allotment details if the lease
+        // has an association to an allotment. 
+        FROM("administrative.ba_unit sublease ");
+        FROM("administrative.required_relationship_baunit rel");
+        WHERE("sublease.name = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} ");
+        WHERE("sublease.type_code = 'subleaseUnit'");
+        WHERE("sublease.status_code = 'current'");
+        WHERE("rel.to_ba_unit_id = sublease.id");
+        WHERE("rel.relation_code = 'sublease'");
+        WHERE("ba.id = rel.from_ba_unit_id");
+
+        sql += " , lease AS (" + SqlBuilder.SQL() + ") ";
+
+        // Primary query for checking lease details
         BEGIN();
         SELECT("b.id AS sublease_id");
-        FROM("administrative.ba_unit b");
+        SELECT("b.type_code AS type_code");
+        SELECT("b.name AS sublease_num");
+        SELECT("b.land_use_code AS land_use_code");
+        SELECT("(SELECT string_agg(TRIM(COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')), ', ') "
+                + "FROM administrative.rrr r, administrative.party_for_rrr pfr, party.party p "
+                + "WHERE r.ba_unit_id = b.id "
+                + "AND r.status_code = 'current' "
+                + "AND r.type_code = 'sublease' "
+                + "AND pfr.rrr_id = r.id "
+                + "AND p.id = pfr.party_id ) AS sublessee_name");
+        SELECT("(SELECT ba.size "
+                + "FROM administrative.ba_unit_area ba "
+                + "WHERE ba.ba_unit_id = b.id "
+                + "AND ba.type_code = 'officialArea') AS area");
+        SELECT("(SELECT district.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  town, "
+                + "     administrative.required_relationship_baunit district "
+                + "WHERE town.to_ba_unit_id = b.id "
+                + "AND town.relation_code = 'town' "
+                + "AND district.to_ba_unit_id = town.from_ba_unit_id "
+                + "AND district.relation_code = 'island') AS district_id");
+        SELECT("(SELECT ba_rel.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  ba_rel "
+                + "WHERE ba_rel.to_ba_unit_id = b.id "
+                + "AND ba_rel.relation_code = 'town') AS town_id");
+        SELECT("(SELECT ba_rel.from_ba_unit_id "
+                + "FROM administrative.required_relationship_baunit  ba_rel "
+                + "WHERE ba_rel.to_ba_unit_id = b.id "
+                + "AND ba_rel.relation_code = 'estate') AS estate_id");
+        SELECT("r.term AS term");
+        SELECT("r.amount AS rental");
+        SELECT("lot.lot_id");
+        SELECT("lot.deed_num");
+        SELECT("lot.folio");
+        SELECT("lot.holder_name");
+        SELECT("lease.lease_id");
+        SELECT("lease.lease_num");
+        SELECT("lease.lessee_name");
+        FROM("administrative.ba_unit b LEFT OUTER JOIN lot ON b.name = lot.link "
+                + " LEFT OUTER JOIN lease ON b.name = lease.link");
         FROM("administrative.rrr r");
         WHERE("b.name = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} ");
         WHERE("b.type_code = 'subleaseUnit'");
@@ -767,32 +901,7 @@ public class SearchSqlProvider {
         WHERE("r.status_code = 'current'");
         WHERE("r.type_code = 'sublease'");
 
-        if (!StringUtility.isEmpty(leaseNumber)) {
-            // Check if the sublease is linked to the lease
-            SELECT("COALESCE((SELECT (lease.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_LEASE_NUM + "}) "
-                    + "FROM administrative.required_relationship_baunit sublease_rel,"
-                    + "     administrative.ba_unit lease "
-                    + "WHERE sublease_rel.to_ba_unit_id = b.id "
-                    + "AND sublease_rel.relation_code = 'sublease' "
-                    + "AND lease.id = sublease_rel.from_ba_unit_id "
-                    + "AND lease.type_code = 'leasedUnit' "
-                    + "AND lease.status_code = 'current'), false) AS sublease_lease_linked");
-        }
-
-        if (!StringUtility.isEmpty(nameFirstPart) && !StringUtility.isEmpty(nameLastPart)) {
-            // Check if the sublease is linked to the allotment
-            SELECT("COALESCE((SELECT (lot.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "}"
-                    + "AND lot.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "}) "
-                    + "FROM administrative.required_relationship_baunit sublease_rel,"
-                    + "     administrative.ba_unit lot "
-                    + "WHERE sublease_rel.to_ba_unit_id = b.id "
-                    + "AND sublease_rel.relation_code = 'sublease' "
-                    + "AND lot.id = sublease_rel.from_ba_unit_id "
-                    + "AND lot.type_code IN ('townAllotmentUnit', 'taxUnit') "
-                    + "AND lot.status_code = 'current'), false) AS sublease_lot_linked");
-        }
-
-        sql = SQL();
+        sql += SqlBuilder.SQL();
 
         return sql;
     }

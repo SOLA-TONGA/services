@@ -78,7 +78,7 @@ public class ApplicationSearchResult extends AbstractReadOnlyEntity {
             + "AND (CASE WHEN #{" + QUERY_PARAM_ITEM_NUMBER + "} = '' THEN true ELSE "
             + "compare_strings(#{" + QUERY_PARAM_ITEM_NUMBER + "}, a.item_number) END) "
             + "AND (CASE WHEN #{" + QUERY_PARAM_CONTACT_NAME + "} = '' THEN true ELSE "
-            + "compare_strings(#{" + QUERY_PARAM_CONTACT_NAME + "}, COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '')) END) "
+            + "compare_strings(#{" + QUERY_PARAM_CONTACT_NAME + "}, COALESCE(p.name, '') || ' ' || COALESCE(p.last_name, '') || ' ' || COALESCE(p.alias, '')) END) "
             + "AND (CASE WHEN #{" + QUERY_PARAM_AGENT_NAME + "} = '' THEN true ELSE "
             + "compare_strings(#{" + QUERY_PARAM_AGENT_NAME + "}, COALESCE(p2.name, '') || ' ' || COALESCE(p2.last_name, '')) END) "
             + "AND (CASE WHEN #{" + QUERY_PARAM_DOCUMENT_NUMBER + "} || #{" + QUERY_PARAM_DOCUMENT_REFERENCE + "} = '' THEN true ELSE EXISTS ( "
