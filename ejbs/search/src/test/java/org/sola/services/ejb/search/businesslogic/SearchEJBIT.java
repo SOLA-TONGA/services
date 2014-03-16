@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -227,7 +227,7 @@ public class SearchEJBIT extends AbstractEJBTest {
         SearchEJBLocal instance = (SearchEJBLocal) getEJBInstance(SearchEJB.class.getSimpleName());
         String firstPart = "602";
         String lastPart = "6629";
-        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null, null);
+        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null, null, null);
         if (result != null) {
             System.out.println("ba unit found: " + result.toString());
         } else {
@@ -247,7 +247,7 @@ public class SearchEJBIT extends AbstractEJBTest {
         SearchEJBLocal instance = (SearchEJBLocal) getEJBInstance(SearchEJB.class.getSimpleName());
         String firstPart = null;
         String lastPart = "6629";
-        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null, null);
+        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null, null, null);
         if (result != null) {
             System.out.println("ba unit found: " + result.toString());
         } else {

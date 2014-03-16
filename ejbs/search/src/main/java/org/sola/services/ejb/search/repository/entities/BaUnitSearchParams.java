@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -54,7 +54,11 @@ public class BaUnitSearchParams extends AbstractEntity {
     private String townId;
     private String islandId;
     private String estateName;
+<<<<<<< HEAD
     private String rrrReference;
+=======
+    private String rrrRef;
+>>>>>>> ab2cbb779c8f5216e6f23f12f5bcf80b1175f6aa
 
     public BaUnitSearchParams() {
         super();
@@ -201,6 +205,14 @@ public class BaUnitSearchParams extends AbstractEntity {
 
     public void setEstateName(String estateName) {
         this.estateName = estateName;
+    }
+
+    public String getRrrRef() {
+        return rrrRef;
+    }
+
+    public void setRrrRef(String rrrRef) {
+        this.rrrRef = rrrRef;
     }
     
     public String getRrrReference() {

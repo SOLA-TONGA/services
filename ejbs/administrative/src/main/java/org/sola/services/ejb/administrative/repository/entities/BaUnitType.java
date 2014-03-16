@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -46,6 +46,7 @@ public class BaUnitType extends AbstractCodeEntity {
     public static final String CODE_ESTATE_UNIT = "estateUnit";
     public static final String CODE_TOWN_UNIT = "townUnit";
     public static final String CODE_ISLAND_UNIT = "islandUnit";
+    public static final String CODE_SUBLEASE_UNIT = "subleaseUnit";
 
     public BaUnitType() {
         super();

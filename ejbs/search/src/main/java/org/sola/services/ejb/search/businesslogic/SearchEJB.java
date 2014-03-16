@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -222,7 +222,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
      */
     @Override
     public PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart,
-            String leaseNumber, String subleaseNumber) {
+            String leaseNumber, String subleaseNumber, String propertyType) {
 
         if ((StringUtility.isEmpty(firstPart) || StringUtility.isEmpty(lastPart))
                 && StringUtility.isEmpty(leaseNumber) && StringUtility.isEmpty(subleaseNumber)) {
@@ -241,33 +241,61 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(PropertyVerifier.QUERY_PARAM_LEASE_NUM, leaseNumber);
         params.put(PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM, subleaseNumber);
 
-        AllotmentVerifier lot = null;
-        if ((!StringUtility.isEmpty(firstPart) && !StringUtility.isEmpty(lastPart))
-                || !StringUtility.isEmpty(leaseNumber)) {
+        PropertyVerifier lot = null;
+        if (!StringUtility.isEmpty(firstPart) && !StringUtility.isEmpty(lastPart)) {
             // Validate the allotment details
             params.remove(CommonSqlProvider.PARAM_QUERY);
             params.put(CommonSqlProvider.PARAM_QUERY,
-                    SearchSqlProvider.buildAllotmentVerifierSql(firstPart, lastPart, leaseNumber));
-            lot = getRepository().getEntity(AllotmentVerifier.class, params);
+                    SearchSqlProvider.buildAllotmentVerifierSql());
+            lot = getRepository().getEntity(PropertyVerifier.class, params);
         }
 
-        LeaseVerifier lease = null;
+        PropertyVerifier lease = null;
         if (!StringUtility.isEmpty(leaseNumber)) {
             params.remove(CommonSqlProvider.PARAM_QUERY);
             params.put(CommonSqlProvider.PARAM_QUERY,
-                    SearchSqlProvider.buildLeaseVerifierSql(leaseNumber));
+                    SearchSqlProvider.buildLeaseVerifierSql());
             // Validate the lease details
-            lease = getRepository().getEntity(LeaseVerifier.class, params);
+            lease = getRepository().getEntity(PropertyVerifier.class, params);
         }
 
-        SubleaseVerifier sublease = null;
+        PropertyVerifier sublease = null;
         if (!StringUtility.isEmpty(subleaseNumber)) {
             params.remove(CommonSqlProvider.PARAM_QUERY);
             params.put(CommonSqlProvider.PARAM_QUERY,
-                    SearchSqlProvider.buildSubleaseVerifierSql(subleaseNumber,
-                    leaseNumber, firstPart, lastPart));
+                    SearchSqlProvider.buildSubleaseVerifierSql());
             // Validate the sublease details
-            sublease = getRepository().getEntity(SubleaseVerifier.class, params);
+            sublease = getRepository().getEntity(PropertyVerifier.class, params);
+        }
+
+        PropertyVerifier result = lot;
+        if (PropertyVerifier.CODE_LEASED_UNIT.equals(propertyType)) {
+            result = lease;
+            if (result == null && lot != null) {
+                result = new PropertyVerifier();
+            }
+            if (lot != null && result.getLotBaUnitId() == null) {
+                result.setLotBaUnitId(lot.getLotBaUnitId());
+                result.setDeedNumber(lot.getDeedNumber());
+                result.setFolio(lot.getFolio());
+                result.setHolderName(lot.getHolderName());
+            }
+        } else if (PropertyVerifier.CODE_SUBLEASE_UNIT.equals(propertyType)) {
+            result = sublease;
+            if (result == null && (lease != null || lot != null)) {
+                result = new PropertyVerifier();
+            }
+            if (lease != null && result.getLeaseBaUnitId() == null) {
+                result.setLeaseBaUnitId(lease.getLeaseBaUnitId());
+                result.setLeaseNumber(lease.getLeaseNumber());
+                result.setLesseeName(lease.getLesseeName());
+            }
+            if (lot != null && result.getLotBaUnitId() == null) {
+                result.setLotBaUnitId(lot.getLotBaUnitId());
+                result.setDeedNumber(lot.getDeedNumber());
+                result.setFolio(lot.getFolio());
+                result.setHolderName(lot.getHolderName());
+            }
         }
 
         params.remove(CommonSqlProvider.PARAM_QUERY);
@@ -276,10 +304,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
                 firstPart, lastPart, leaseNumber, subleaseNumber));
         // Check if there are any applications using this allotment/lease info. 
         String apps = getRepository().getScalar(String.class, params);
-
-        PropertyVerifier result = null;
-        if (lot != null || lease != null || sublease != null || apps != null) {
-            result = new PropertyVerifier(lease, lot, sublease, apps);
+        if (result != null) {
+            result.setApplicationsWhereFound(apps);
         }
         return result;
     }
@@ -786,7 +812,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(BaUnitSearchResult.QUERY_PARAM_ISLAND, searchParams.getIslandId());
         params.put(BaUnitSearchResult.QUERY_PARAM_OTHER_RIGHTHOLDER, searchParams.getOtherRightholder());
         params.put(BaUnitSearchResult.QUERY_PARAM_ESTATE_NAME, searchParams.getEstateName());
-        params.put(BaUnitSearchResult.QUERY_PARAM_RRR_REFERENCE, searchParams.getRrrReference());
+        params.put(BaUnitSearchResult.QUERY_PARAM_RRR_REF, searchParams.getRrrRef());
 
         return getRepository().getEntityList(BaUnitSearchResult.class, params);
     }

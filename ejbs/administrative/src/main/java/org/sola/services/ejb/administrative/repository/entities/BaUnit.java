@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -34,6 +34,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import org.sola.common.SOLAException;
+import org.sola.common.StringUtility;
 import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.LocalInfo;
 import org.sola.services.common.repository.*;
@@ -342,14 +343,13 @@ public class BaUnit extends AbstractVersionedEntity {
         if (this.isNew()) {
             setTransactionId(LocalInfo.getTransactionId());
         }
-        if (getNameFirstpart() == null || getNameFirstpart().trim().length() < 1
-                || getNameLastpart() == null || (getNameLastpart().trim().length() < 1
-                && isAllotment())) {
+        if ((StringUtility.isEmpty(getNameFirstpart()) || StringUtility.isEmpty(getNameLastpart()))
+                && (isAllotment() || isLease() || isSublease())) {
             // The user must specify the name for the ba unit (Lease or Allotment)
             throw new SOLAException(ServiceMessage.EJB_ADMINISTRATIVE_DEED_NUM_REQUIRED);
         }
-        if (getName() == null || getName().trim().equals("")) {
-            if (isAllotment()) {
+        if (StringUtility.isEmpty(getName())) {
+            if (isAllotment() || isSublease()) {
                 setName(getNameFirstpart() + "/" + getNameLastpart());
             } else {
                 setName(getNameFirstpart());
@@ -401,5 +401,12 @@ public class BaUnit extends AbstractVersionedEntity {
      */
     public boolean isIsland() {
         return BaUnitType.CODE_ISLAND_UNIT.equals(this.getTypeCode());
+    }
+
+    /**
+     * Returns true if the property represents a sublease
+     */
+    public boolean isSublease() {
+        return BaUnitType.CODE_SUBLEASE_UNIT.equals(this.getTypeCode());
     }
 }

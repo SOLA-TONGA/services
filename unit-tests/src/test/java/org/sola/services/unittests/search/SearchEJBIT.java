@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -74,7 +74,7 @@ public class SearchEJBIT extends AbstractEJBTest {
                 SearchEJB.class.getSimpleName());
         String firstPart = "17"; // Samoan data
         String lastPart = "4841";
-        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null, null);
+        PropertyVerifier result = instance.getPropertyVerifier("", firstPart, lastPart, null, null, null);
         if (result != null) {
             System.out.println("Parcel Exists: " + result.toString());
            // assertFalse(result.isHasLocation());
@@ -87,7 +87,7 @@ public class SearchEJBIT extends AbstractEJBTest {
         System.out.println("testGetVerifyProperty - Parcel Exists with Location");
         firstPart = "335"; // Samoan data
         lastPart = "2775";
-        result = instance.getPropertyVerifier("", firstPart, lastPart, null, null);
+        result = instance.getPropertyVerifier("", firstPart, lastPart, null, null, null);
         if (result != null) {
             System.out.println("Parcel Exists with Location: " + result.toString());
          //   assertTrue(result.isHasLocation());

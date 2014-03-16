@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -49,7 +49,7 @@ public interface SearchEJBLocal extends AbstractEJBLocal {
      * See {@linkplain SearchEJB#getPropertyVerifier(java.lang.String, java.lang.String, java.lang.String)
      * SearchEJB.getPropertyVerifier}.
      */
-    PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart, String leaseNumber, String subleaseNumber);
+    PropertyVerifier getPropertyVerifier(String applicationNumber, String firstPart, String lastPart, String leaseNumber, String subleaseNumber, String propertyType);
 
     /**
      * See {@linkplain SearchEJB#getGenericResultList(java.lang.String, java.util.Map)

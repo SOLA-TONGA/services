@@ -1,6 +1,6 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2013 - Food and Agriculture Organization of the United Nations (FAO).
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -72,8 +72,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private String leaseNumber;
     @Column(name = "lease_term")
     private BigDecimal leaseTerm;
-    @Column(name = "lease_area")
-    private BigDecimal leaseArea;
     @Column(name = "amount")
     private BigDecimal amount;
     @Column(name = "registration_date")
@@ -90,16 +88,18 @@ public class ApplicationProperty extends AbstractVersionedEntity {
     private String townId;
     @Column(name = "lessee_name")
     private String lesseeName;
-    @Column(name = "lease_linked")
-    private boolean leaseLinked;
     @Column(name = "lease_ba_unit_id")
     private String leaseBaUnitId;
     @Column(name = "sublease_number")
     private String subleaseNumber;
-    @Column(name = "sublease_linked")
-    private boolean subleaseLinked;
     @Column(name = "sublease_ba_unit_id")
     private String subleaseBaUnitId;
+    @Column(name = "sublessee_name")
+    private String sublesseeName;
+    @Column(name = "registered_name")
+    private String registeredName;
+    @Column(name = "type_code")
+    private String typeCode;
 
     public ApplicationProperty() {
         super();
@@ -202,14 +202,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.leaseTerm = leaseTerm;
     }
 
-    public BigDecimal getLeaseArea() {
-        return leaseArea;
-    }
-
-    public void setLeaseArea(BigDecimal leaseArea) {
-        this.leaseArea = leaseArea;
-    }
-
     public BigDecimal getAmount() {
         return amount;
     }
@@ -274,14 +266,6 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.lesseeName = lesseeName;
     }
 
-    public boolean isLeaseLinked() {
-        return leaseLinked;
-    }
-
-    public void setLeaseLinked(boolean leaseLinked) {
-        this.leaseLinked = leaseLinked;
-    }
-
     public String getLeaseBaUnitId() {
         return leaseBaUnitId;
     }
@@ -298,19 +282,35 @@ public class ApplicationProperty extends AbstractVersionedEntity {
         this.subleaseNumber = subleaseNumber;
     }
 
-    public boolean isSubleaseLinked() {
-        return subleaseLinked;
-    }
-
-    public void setSubleaseLinked(boolean subleaseLinked) {
-        this.subleaseLinked = subleaseLinked;
-    }
-
     public String getSubleaseBaUnitId() {
         return subleaseBaUnitId;
     }
 
     public void setSubleaseBaUnitId(String subleaseBaUnitId) {
         this.subleaseBaUnitId = subleaseBaUnitId;
+    }
+
+    public String getSublesseeName() {
+        return sublesseeName;
+    }
+
+    public void setSublesseeName(String sublesseeName) {
+        this.sublesseeName = sublesseeName;
+    }
+
+    public String getRegisteredName() {
+        return registeredName;
+    }
+
+    public void setRegisteredName(String registeredName) {
+        this.registeredName = registeredName;
+    }
+
+    public String getTypeCode() {
+        return typeCode;
+    }
+
+    public void setTypeCode(String typeCode) {
+        this.typeCode = typeCode;
     }
 }
