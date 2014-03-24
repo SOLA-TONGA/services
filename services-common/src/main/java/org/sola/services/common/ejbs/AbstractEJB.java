@@ -39,6 +39,7 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 import org.sola.common.RolesConstants;
 import org.sola.common.SOLAException;
+import org.sola.common.logging.LogUtility;
 import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.LocalInfo;
 import org.sola.services.common.repository.entities.AbstractCodeEntity;
@@ -163,7 +164,7 @@ public abstract class AbstractEJB implements AbstractEJBLocal {
      */
     @PostConstruct
     private void onPostConstruct() {
-        URL connectConfigFileUrl = this.getClass().getResource(CommonRepository.CONNECT_CONFIG_FILE_NAME);
+        URL connectConfigFileUrl = this.getClass().getResource(CommonRepository.CONNECT_CONFIG_FILE_NAME);        
         repository = new CommonRepositoryImpl(connectConfigFileUrl);
         postConstruct();
     }

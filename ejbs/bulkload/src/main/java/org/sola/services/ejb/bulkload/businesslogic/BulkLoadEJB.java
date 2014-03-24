@@ -125,7 +125,7 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
             result = result.replaceAll("DSL-", "");
             result = result.replaceAll("DL", "");
             result = result.replaceAll("_A1b", "");
-            result = result.substring(result.lastIndexOf(";") + 1);
+            result = result.substring(result.lastIndexOf(File.pathSeparator) + 1);
         }
         return result;
     }
@@ -133,7 +133,7 @@ public class BulkLoadEJB extends AbstractEJB implements BulkLoadEJBLocal {
     private String getFileName(String fileName) {
         String result = "";
         if (!StringUtility.isEmpty(fileName)) {
-            result = fileName.substring(fileName.lastIndexOf(";") + 1);
+            result = fileName.substring(fileName.lastIndexOf(File.pathSeparator) + 1);
         }
         return result;
     }
