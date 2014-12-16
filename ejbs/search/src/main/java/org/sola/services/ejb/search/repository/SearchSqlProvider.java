@@ -36,6 +36,8 @@ import static org.apache.ibatis.jdbc.SqlBuilder.*;
 import org.sola.common.StringUtility;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchParams;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchResult;
+import org.sola.services.ejb.search.repository.entities.DraftingSearchParams;
+import org.sola.services.ejb.search.repository.entities.DraftingSearchResult;
 import org.sola.services.ejb.search.repository.entities.PropertyVerifier;
 
 /**
@@ -965,6 +967,38 @@ public class SearchSqlProvider {
             // Only sublease details provided. 
             WHERE("ap.sublease_number = #{" + PropertyVerifier.QUERY_PARAM_SUBLEASE_NUM + "} ");
         }
+        sql = SQL();
+        return sql;
+    }
+    
+    /**
+     * Uses the Drafting Search parameters to build an appropriate SQL Query.
+     * This method does not inject the search parameter values into the SQL as
+     * that would prevent the database from performing statement caching.
+     *
+     * @param params Object containing the parameter values provided by the user
+     * @return SQL String
+     */
+    public static String buildSearchDraftingSql(DraftingSearchParams params) {
+        String sql;
+        BEGIN();
+        SELECT("a.item_number");
+        SELECT("a.date_received");
+        SELECT("a.item_firstname");
+        SELECT("a.item_lastname");
+        SELECT("a.plan_number");
+        SELECT("a.location");
+        FROM("application.drafting a");
+        if (!StringUtility.isEmpty(params.getItemNumber())) {
+            WHERE("a.item_number = #{" + DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER + "}");
+            WHERE("drafting.date_received = #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED + "}");
+            WHERE("drafting.item_firstname = #{" + DraftingSearchResult.QUERY_PARAM_FIRST_NAME + "}");
+            WHERE("drafting.item_lastname = #{" + DraftingSearchResult.QUERY_PARAM_LAST_NAME + "}");
+            WHERE("drafting.plan_number = #{" + DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER + "}");
+            WHERE("drafting.location = #{" + DraftingSearchResult.QUERY_PARAM_LOCATION + "}");
+        }
+        ORDER_BY(DraftingSearchResult.QUERY_ORDER_BY
+                + " LIMIT 100");
         sql = SQL();
         return sql;
     }

@@ -906,4 +906,27 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         }
         return value;
     }
+    
+    /**
+     * Executes a search across all drafting records that was migrated from the Drafting section database
+     *
+     * @param searchParams The search criteria to use.
+     */
+    @Override
+    @RolesAllowed({RolesConstants.DRAFTING_SEARCH})
+    public List<DraftingSearchResult> searchDrafting(DraftingSearchParams searchParams) {
+        Map params = new HashMap<String, Object>();
+
+        if (StringUtility.isEmpty(searchParams.getItemNumber())) {
+            params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchDraftingSql(searchParams));
+        }
+        params.put(DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER, searchParams.getItemNumber());
+        params.put(DraftingSearchResult.QUERY_PARAM_FIRST_NAME, searchParams.getFirstName());
+        params.put(DraftingSearchResult.QUERY_PARAM_LAST_NAME, searchParams.getLastName());
+        params.put(DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED, searchParams.getDateReceived());
+        params.put(DraftingSearchResult.QUERY_PARAM_LOCATION, searchParams.getLocation());
+        params.put(DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER, searchParams.getPlanNumber());
+
+        return getRepository().getEntityList(DraftingSearchResult.class, params);
+    }
 }

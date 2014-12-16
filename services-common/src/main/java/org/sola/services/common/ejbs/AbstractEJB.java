@@ -49,6 +49,7 @@ import org.sola.services.common.repository.DatabaseConnectionManager;
 import org.sola.services.common.repository.entities.AbstractEntity;
 
 @DeclareRoles({
+    RolesConstants.DRAFTING_SEARCH,
     RolesConstants.DASHBOARD_VIEW_ASSIGNED_APPS,
     RolesConstants.DASHBOARD_VIEW_UNASSIGNED_APPS,
     RolesConstants.APPLICATION_VIEW_APPS,

@@ -188,6 +188,8 @@ public interface SearchEJBLocal extends AbstractEJBLocal {
      */
     List<RightsExportResult> searchRightsForExport(RightsExportParams searchParams);
     
+    List<DraftingSearchResult> searchDrafting(DraftingSearchParams searchParams);
+    
     /**
      * See {@linkplain SearchEJB#getExtentOfPublicDisplayMap(String)}.
      */

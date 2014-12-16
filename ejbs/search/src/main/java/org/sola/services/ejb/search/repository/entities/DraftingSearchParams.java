@@ -25,22 +25,73 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package org.sola.services.ejb.application.repository.entities;
+package org.sola.services.ejb.search.repository.entities;
 
-import javax.persistence.Table;
-import org.sola.services.common.repository.entities.AbstractCodeEntity;
+import java.util.Date;
+import org.sola.services.common.repository.entities.AbstractEntity;
 
 /**
  *
  * @author Admin
  */
-@Table(name = "draughting", schema = "application")
-public class Draughting extends AbstractCodeEntity{
-    public Draughting(){
+public class DraftingSearchParams extends AbstractEntity{
+    private String itemNumber;
+    private String firstName;
+    private String lastName;
+    private String planNumber;
+    private String location;
+    private Date dateReceived;
+    
+    public DraftingSearchParams(){
         super();
     }
+
+    public String getItemNumber() {
+        return itemNumber;
+    }
+
+    public void setItemNumber(String itemNumber) {
+        this.itemNumber = itemNumber;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPlanNumber() {
+        return planNumber;
+    }
+
+    public void setPlanNumber(String planNumber) {
+        this.planNumber = planNumber;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Date getDateReceived() {
+        return dateReceived;
+    }
+
+    public void setDateReceived(Date dateReceived) {
+        this.dateReceived = dateReceived;
+    }
+    
 }
