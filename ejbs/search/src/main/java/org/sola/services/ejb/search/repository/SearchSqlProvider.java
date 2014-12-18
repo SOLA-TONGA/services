@@ -1,28 +1,30 @@
 /**
  * ******************************************************************************************
- * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations (FAO).
- * All rights reserved.
+ * Copyright (C) 2014 - Food and Agriculture Organization of the United Nations
+ * (FAO). All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- *    1. Redistributions of source code must retain the above copyright notice,this list
- *       of conditions and the following disclaimer.
- *    2. Redistributions in binary form must reproduce the above copyright notice,this list
- *       of conditions and the following disclaimer in the documentation and/or other
- *       materials provided with the distribution.
- *    3. Neither the name of FAO nor the names of its contributors may be used to endorse or
- *       promote products derived from this software without specific prior written permission.
+ * 1. Redistributions of source code must retain the above copyright notice,this
+ * list of conditions and the following disclaimer. 2. Redistributions in binary
+ * form must reproduce the above copyright notice,this list of conditions and
+ * the following disclaimer in the documentation and/or other materials provided
+ * with the distribution. 3. Neither the name of FAO nor the names of its
+ * contributors may be used to endorse or promote products derived from this
+ * software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT
- * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,STRICT LIABILITY,OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT,STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  * *********************************************************************************************
  */
 /*
@@ -165,7 +167,6 @@ public class SearchSqlProvider {
 
 //        sql = sql + SQL() + " UNION ";
 //        sortClassifier++;
-
 //        // RRR
 //        BEGIN();
 //        SELECT("'" + RRR_GROUP + "' AS record_group");
@@ -188,7 +189,6 @@ public class SearchSqlProvider {
 //        WHERE("ser.application_id = #{" + PARAM_APPLICATION_ID + "}");
 //        WHERE("tran.from_service_id = ser.id");
 //        WHERE("rrr.transaction_id = tran.id");
-
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
 
@@ -232,7 +232,6 @@ public class SearchSqlProvider {
                 + " AS user_fullname");
         FROM("application.application_property_historic prop_hist");
         WHERE("prop_hist.application_id = #{" + PARAM_APPLICATION_ID + "}");
-
 
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
@@ -281,7 +280,6 @@ public class SearchSqlProvider {
                 + " LEFT JOIN source.source source "
                 + " ON source1.source_id = source.id ");
         WHERE("source1.application_id = #{" + PARAM_APPLICATION_ID + "}");
-
 
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
@@ -339,7 +337,6 @@ public class SearchSqlProvider {
 
         sql = sql + SQL() + " UNION ";
         sortClassifier++;
-
 
         // contact_person 
         BEGIN();
@@ -685,7 +682,6 @@ public class SearchSqlProvider {
         WHERE("b.name_firstpart = #{" + PropertyVerifier.QUERY_PARAM_FIRST_PART + "} ");
         WHERE("b.name_lastpart = #{" + PropertyVerifier.QUERY_PARAM_LAST_PART + "} ");
 
-
         sql = SQL();
         return sql;
     }
@@ -970,7 +966,7 @@ public class SearchSqlProvider {
         sql = SQL();
         return sql;
     }
-    
+
     /**
      * Uses the Drafting Search parameters to build an appropriate SQL Query.
      * This method does not inject the search parameter values into the SQL as
@@ -990,13 +986,24 @@ public class SearchSqlProvider {
         SELECT("a.location");
         FROM("application.drafting a");
         if (!StringUtility.isEmpty(params.getItemNumber())) {
-            WHERE("a.item_number = #{" + DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER + "}");
-            WHERE("drafting.date_received = #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED + "}");
-            WHERE("drafting.item_firstname = #{" + DraftingSearchResult.QUERY_PARAM_FIRST_NAME + "}");
-            WHERE("drafting.item_lastname = #{" + DraftingSearchResult.QUERY_PARAM_LAST_NAME + "}");
-            WHERE("drafting.plan_number = #{" + DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER + "}");
-            WHERE("drafting.location = #{" + DraftingSearchResult.QUERY_PARAM_LOCATION + "}");
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER
+                    + "}, COALESCE(a.item_number, ''))");
         }
+        if (!StringUtility.isEmpty(params.getFirstName())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_FIRST_NAME
+                    + "}, COALESCE(a.item_firstname, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getLastName())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_LAST_NAME
+                    + "}, COALESCE(a.item_lastname, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getPlanNumber())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER
+                    + "}, COALESCE(a.plan_number, ''))");
+        }
+        WHERE("drafting.date_received = #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED + "}");
+        WHERE("drafting.location = #{" + DraftingSearchResult.QUERY_PARAM_LOCATION + "}");
+
         ORDER_BY(DraftingSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
         sql = SQL();

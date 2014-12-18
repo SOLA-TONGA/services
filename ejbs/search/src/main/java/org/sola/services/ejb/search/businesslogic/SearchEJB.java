@@ -917,9 +917,7 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
     public List<DraftingSearchResult> searchDrafting(DraftingSearchParams searchParams) {
         Map params = new HashMap<String, Object>();
 
-        if (StringUtility.isEmpty(searchParams.getItemNumber())) {
-            params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchDraftingSql(searchParams));
-        }
+        params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchDraftingSql(searchParams));
         params.put(DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER, searchParams.getItemNumber());
         params.put(DraftingSearchResult.QUERY_PARAM_FIRST_NAME, searchParams.getFirstName());
         params.put(DraftingSearchResult.QUERY_PARAM_LAST_NAME, searchParams.getLastName());
