@@ -35,12 +35,24 @@ import org.sola.services.common.repository.entities.AbstractEntity;
  * @author Admin
  */
 public class DraftingSearchParams extends AbstractEntity{
+    private String id;
+    private String serviceId;
+    private String natureOfSurvey;
+    private String traceBy;
+    private Date traceDate;
+    private String drawDeed;
+    private String deedNumber;
+    private String plottingBy;
+    private Date plottingDate;
+    private String referInfo;
+    private String comment;
     private String itemNumber;
     private String firstName;
     private String lastName;
     private String planNumber;
     private String location;
-    private Date dateReceived;
+    private Date dateReceivedFrom;
+    private Date dateReceivedTo;
     
     public DraftingSearchParams(){
         super();
@@ -86,12 +98,108 @@ public class DraftingSearchParams extends AbstractEntity{
         this.location = location;
     }
 
-    public Date getDateReceived() {
-        return dateReceived;
+    public Date getDateReceivedFrom() {
+        return dateReceivedFrom;
     }
 
-    public void setDateReceived(Date dateReceived) {
-        this.dateReceived = dateReceived;
+    public void setDateReceivedFrom(Date dateReceivedFrom) {
+        this.dateReceivedFrom = dateReceivedFrom;
     }
-    
+
+    public Date getDateReceivedTo() {
+        return dateReceivedTo;
+    }
+
+    public void setDateReceivedTo(Date dateReceivedTo) {
+        this.dateReceivedTo = dateReceivedTo;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getNatureOfSurvey() {
+        return natureOfSurvey;
+    }
+
+    public void setNatureOfSurvey(String natureOfSurvey) {
+        this.natureOfSurvey = natureOfSurvey;
+    }
+
+    public String getTraceBy() {
+        return traceBy;
+    }
+
+    public void setTraceBy(String traceBy) {
+        this.traceBy = traceBy;
+    }
+
+    public Date getTraceDate() {
+        return traceDate;
+    }
+
+    public void setTraceDate(Date traceDate) {
+        this.traceDate = traceDate;
+    }
+
+    public String getDrawDeed() {
+        return drawDeed;
+    }
+
+    public void setDrawDeed(String drawDeed) {
+        this.drawDeed = drawDeed;
+    }
+
+    public String getDeedNumber() {
+        return deedNumber;
+    }
+
+    public void setDeedNumber(String deedNumber) {
+        this.deedNumber = deedNumber;
+    }
+
+    public String getPlottingBy() {
+        return plottingBy;
+    }
+
+    public void setPlottingBy(String plottingBy) {
+        this.plottingBy = plottingBy;
+    }
+
+    public Date getPlottingDate() {
+        return plottingDate;
+    }
+
+    public void setPlottingDate(Date plottingDate) {
+        this.plottingDate = plottingDate;
+    }
+
+    public String getReferInfo() {
+        return referInfo;
+    }
+
+    public void setReferInfo(String referInfo) {
+        this.referInfo = referInfo;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
 }

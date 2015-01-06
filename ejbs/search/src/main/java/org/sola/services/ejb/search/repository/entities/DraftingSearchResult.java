@@ -18,10 +18,12 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_ITEM_NUMBER = "itemNumber";
     public static final String QUERY_PARAM_FIRST_NAME = "firstName";
     public static final String QUERY_PARAM_LAST_NAME = "lastName";
-    public static final String QUERY_PARAM_DATE_RECEIVED = "dateReceived";
+    public static final String QUERY_PARAM_DATE_RECEIVED_FROM = "dateReceivedFrom";
+    public static final String QUERY_PARAM_DATE_RECEIVED_TO = "dateReceivedTo";
     public static final String QUERY_PARAM_LOCATION = "location";
     public static final String QUERY_PARAM_PLAN_NUMBER = "planNumber";
     public static final String QUERY_ORDER_BY = "a.item_number";
+    public static final String SEARCH_QUERY = "SELECT ";
     
     @Id
     @Column(name = "id")

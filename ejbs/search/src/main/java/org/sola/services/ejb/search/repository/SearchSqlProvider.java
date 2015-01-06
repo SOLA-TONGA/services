@@ -1001,8 +1001,17 @@ public class SearchSqlProvider {
             WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER
                     + "}, COALESCE(a.plan_number, ''))");
         }
-        WHERE("drafting.date_received = #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED + "}");
-        WHERE("drafting.location = #{" + DraftingSearchResult.QUERY_PARAM_LOCATION + "}");
+        if (!StringUtility.isEmpty(params.getLocation())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_LOCATION
+                    + "}, COALESCE(a.location, ''))");
+        }
+        if (params.getDateReceivedFrom() != null) {
+            WHERE("rrr.registration_date >= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");
+        }
+
+        if (params.getDateReceivedTo() != null) {
+            WHERE("rrr.registration_date <= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
+        }
 
         ORDER_BY(DraftingSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
