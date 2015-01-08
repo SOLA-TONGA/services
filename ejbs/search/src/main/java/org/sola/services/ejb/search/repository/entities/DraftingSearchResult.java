@@ -15,6 +15,8 @@ import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
  */
 public class DraftingSearchResult extends AbstractReadOnlyEntity{
     
+    public static final String QUERY_PARAM_ID = "id";
+    public static final String QUERY_PARAM_SERVICE_ID = "serviceId";
     public static final String QUERY_PARAM_ITEM_NUMBER = "itemNumber";
     public static final String QUERY_PARAM_FIRST_NAME = "firstName";
     public static final String QUERY_PARAM_LAST_NAME = "lastName";
@@ -22,8 +24,16 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_DATE_RECEIVED_TO = "dateReceivedTo";
     public static final String QUERY_PARAM_LOCATION = "location";
     public static final String QUERY_PARAM_PLAN_NUMBER = "planNumber";
+    public static final String QUERY_PARAM_NATURE_OF_SURVEY = "natureOfSurvey";
+    public static final String QUERY_PARAM_TRACE_BY = "traceBy";
+    public static final String QUERY_PARAM_TRACE_DATE = "traceDate";
+    public static final String QUERY_PARAM_DRAW_DEED = "drawDeed";
+    public static final String QUERY_PARAM_DEED_NUMBER = "deedNumber";
+    public static final String QUERY_PARAM_PLOTTING_BY = "plottingBy";
+    public static final String QUERY_PARAM_PLOTTING_DATE = "plottingDate";
+    public static final String QUERY_PARAM_REFER_INTO = "referInfo";
+    public static final String QUERY_PARAM_COMMENT = "comment";
     public static final String QUERY_ORDER_BY = "a.item_number";
-    public static final String SEARCH_QUERY = "SELECT ";
     
     @Id
     @Column(name = "id")

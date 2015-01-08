@@ -978,13 +978,32 @@ public class SearchSqlProvider {
     public static String buildSearchDraftingSql(DraftingSearchParams params) {
         String sql;
         BEGIN();
+        SELECT("a.id");
+        SELECT("a.service_id");
         SELECT("a.item_number");
         SELECT("a.date_received");
         SELECT("a.item_firstname");
         SELECT("a.item_lastname");
         SELECT("a.plan_number");
         SELECT("a.location");
+        SELECT("a.nature_of_survey");
+        SELECT("a.trace_by");
+        SELECT("a.trace_date");
+        SELECT("a.draw_deed");
+        SELECT("a.deed_number");
+        SELECT("a.plotting_by");
+        SELECT("a.plotting_date");
+        SELECT("a.refer_info");
+        SELECT("a.comment");
         FROM("application.drafting a");
+        if (!StringUtility.isEmpty(params.getId())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_ID
+                    + "}, COALESCE(a.id, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getServiceId())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_SERVICE_ID
+                    + "}, COALESCE(a.service_id, ''))");
+        }
         if (!StringUtility.isEmpty(params.getItemNumber())) {
             WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER
                     + "}, COALESCE(a.item_number, ''))");
@@ -1005,14 +1024,50 @@ public class SearchSqlProvider {
             WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_LOCATION
                     + "}, COALESCE(a.location, ''))");
         }
+        if (!StringUtility.isEmpty(params.getNatureOfSurvey())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_NATURE_OF_SURVEY
+                    + "}, COALESCE(a.nature_of_survey, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getTraceBy())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_TRACE_BY
+                    + "}, COALESCE(a.trace_by, ''))");
+        }
+        if (params.getTraceDate() != null) {
+            WHERE("a.trace_date = #{" + DraftingSearchResult.QUERY_PARAM_TRACE_DATE + "}");
+        }
+        if (!StringUtility.isEmpty(params.getDrawDeed())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_DRAW_DEED
+                    + "}, COALESCE(a.draw_deed, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getDeedNumber())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_DEED_NUMBER
+                    + "}, COALESCE(a.deed_number, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getPlottingBy())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_PLOTTING_BY
+                    + "}, COALESCE(a.plotting_by, ''))");
+        }
+        if (params.getPlottingDate() != null) {
+            WHERE("a.plotting_date = #{" + DraftingSearchResult.QUERY_PARAM_PLOTTING_DATE + "}");
+        }
+        if (!StringUtility.isEmpty(params.getReferInfo())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_REFER_INTO
+                    + "}, COALESCE(a.refer_info, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getComment())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_COMMENT
+                    + "}, COALESCE(a.comment, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getPlottingBy())) {
+            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_PLOTTING_BY
+                    + "}, COALESCE(a.plotting_by, ''))");
+        }
         if (params.getDateReceivedFrom() != null) {
-            WHERE("rrr.registration_date >= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");
+            WHERE("a.date_received >= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");
         }
-
         if (params.getDateReceivedTo() != null) {
-            WHERE("rrr.registration_date <= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
-        }
-
+            WHERE("a.date_received <= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
+        }  
         ORDER_BY(DraftingSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
         sql = SQL();
