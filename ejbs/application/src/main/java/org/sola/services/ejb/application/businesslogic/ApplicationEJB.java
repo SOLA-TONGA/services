@@ -1301,4 +1301,15 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
         return result;
     }
     
+    @Override
+    public Drafting getDrafting(String id) {
+        return getRepository().getEntity(Drafting.class, id);
+    }
+    
+    @Override
+    @RolesAllowed(RolesConstants.DRAFTING_EDIT)
+    public Drafting saveDrafting(Drafting drafting) {
+        return getRepository().saveEntity(drafting);
+    }
+    
 }

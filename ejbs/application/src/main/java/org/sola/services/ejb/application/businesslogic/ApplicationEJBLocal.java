@@ -267,4 +267,9 @@ public interface ApplicationEJBLocal extends AbstractEJBLocal {
      * ApplicationEJB.getWorkSummary}.
      */
     List<WorkSummary> getWorkSummary(Date fromDate, Date toDate);
+    
+    Drafting getDrafting(String id);
+    
+    Drafting saveDrafting(Drafting drafting);
+
 }
