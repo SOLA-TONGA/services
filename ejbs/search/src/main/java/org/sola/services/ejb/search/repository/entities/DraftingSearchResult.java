@@ -43,7 +43,7 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
     @Column(name = "item_number")
     private String itemNumber;
     @Column(name = "date_received")
-    private Date dateReceived;
+    private Date receiveDate;
     @Column(name = "item_firstname")
     private String firstName;
     @Column(name = "item_lastname")
@@ -99,12 +99,12 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
         this.itemNumber = itemNumber;
     }
 
-    public Date getDateReceived() {
-        return dateReceived;
+    public Date getReceiveDate() {
+        return receiveDate;
     }
 
-    public void setDateReceived(Date dateReceived) {
-        this.dateReceived = dateReceived;
+    public void setReceiveDate(Date receiveDate) {
+        this.receiveDate = receiveDate;
     }
 
     public String getFirstName() {

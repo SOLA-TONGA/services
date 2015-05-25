@@ -52,7 +52,7 @@ public class Drafting extends AbstractVersionedEntity{
     @Column(name = "item_number")
     private String itemNumber;
     @Column(name = "date_received")
-    private Date dateReceived;
+    private Date receiveDate;
     @Column(name = "item_firstname")
     private String firstName;
     @Column(name = "item_lastname")
@@ -85,6 +85,7 @@ public class Drafting extends AbstractVersionedEntity{
     }
 
     public String getId() {
+        id = id == null ? generateId() : id;
         return id;
     }
 
@@ -108,12 +109,12 @@ public class Drafting extends AbstractVersionedEntity{
         this.itemNumber = itemNumber;
     }
 
-    public Date getDateReceived() {
-        return dateReceived;
+    public Date getReceiveDate() {
+        return receiveDate;
     }
 
-    public void setDateReceived(Date dateReceived) {
-        this.dateReceived = dateReceived;
+    public void setReceiveDate(Date receiveDate) {
+        this.receiveDate = receiveDate;
     }
 
     public String getFirstName() {
