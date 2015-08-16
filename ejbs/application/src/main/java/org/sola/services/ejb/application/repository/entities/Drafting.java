@@ -68,7 +68,7 @@ public class Drafting extends AbstractVersionedEntity{
     @Column(name = "sent_to")
     private String sentTo;
     @Column(name = "send_date")
-    private Date sentDate;
+    private Date sendDate;
     @Column(name = "return_date")
     private Date returnDate;
     @Column(name = "draw_deed")
@@ -82,7 +82,7 @@ public class Drafting extends AbstractVersionedEntity{
     @Column(name = "plan_number")
     private String planNumber;
     @Column(name = "refer_info")
-    private String reference;
+    private String referInfo;
     @Column(name = "comment")
     private String comment;
     
@@ -179,12 +179,12 @@ public class Drafting extends AbstractVersionedEntity{
         this.sentTo = sentTo;
     }
 
-    public Date getSentDate() {
-        return sentDate;
+    public Date getSendDate() {
+        return sendDate;
     }
 
-    public void setSentDate(Date sentDate) {
-        this.sentDate = sentDate;
+    public void setSendDate(Date sendDate) {
+        this.sendDate = sendDate;
     }
 
     public Date getReturnDate() {
@@ -235,12 +235,12 @@ public class Drafting extends AbstractVersionedEntity{
         this.planNumber = planNumber;
     }
 
-    public String getReference() {
-        return reference;
+    public String getReferInfo() {
+        return referInfo;
     }
 
-    public void setReference(String reference) {
-        this.reference = reference;
+    public void setReferInfo(String referInfo) {
+        this.referInfo = referInfo;
     }
 
     public String getComment() {

@@ -34,6 +34,9 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_REFER_INTO = "referInfo";
     public static final String QUERY_PARAM_COMMENT = "comment";
     public static final String QUERY_ORDER_BY = "a.item_number";
+    public static final String QUERY_SENT_TO = "sentTo";
+    public static final String QUERY_SEND_DATE = "sendDate";
+    public static final String QUERY_RETURN_DATE = "returnDate";
     
     @Id
     @Column(name = "id")
@@ -56,6 +59,12 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
     private String traceBy;
     @Column(name = "trace_date")
     private Date traceDate;
+    @Column(name = "sent_to")
+    private String sentTo;
+    @Column(name = "send_date")
+    private Date sendDate;
+    @Column(name = "return_date")
+    private Date returnDate;
     @Column(name = "draw_deed")
     private String drawDeed;
     @Column(name = "deed_number")
@@ -209,6 +218,30 @@ public class DraftingSearchResult extends AbstractReadOnlyEntity{
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+    
+    public String getSentTo() {
+        return sentTo;
+    }
+
+    public void setSentTo(String sentTo) {
+        this.sentTo = sentTo;
+    }
+    
+    public Date getSendDate() {
+        return sendDate;
+    }
+
+    public void setSendDate(Date sendDate) {
+        this.sendDate = sendDate;
+    }
+    
+    public Date getReturnDate() {
+        return returnDate;
+    }
+    
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
     }
     
 }

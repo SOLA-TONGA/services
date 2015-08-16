@@ -989,6 +989,9 @@ public class SearchSqlProvider {
         SELECT("a.nature_of_survey");
         SELECT("a.trace_by");
         SELECT("a.trace_date");
+        SELECT("a.sent_to");
+        SELECT("a.send_date");
+        SELECT("a.return_date");
         SELECT("a.draw_deed");
         SELECT("a.deed_number");
         SELECT("a.plotting_by");
@@ -1050,6 +1053,7 @@ public class SearchSqlProvider {
         if (params.getPlottingDate() != null) {
             WHERE("a.plotting_date = #{" + DraftingSearchResult.QUERY_PARAM_PLOTTING_DATE + "}");
         }
+ 
         if (!StringUtility.isEmpty(params.getReferInfo())) {
             WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_REFER_INTO
                     + "}, COALESCE(a.refer_info, ''))");
@@ -1057,10 +1061,6 @@ public class SearchSqlProvider {
         if (!StringUtility.isEmpty(params.getComment())) {
             WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_COMMENT
                     + "}, COALESCE(a.comment, ''))");
-        }
-        if (!StringUtility.isEmpty(params.getPlottingBy())) {
-            WHERE("compare_strings(#{" + DraftingSearchResult.QUERY_PARAM_PLOTTING_BY
-                    + "}, COALESCE(a.plotting_by, ''))");
         }
         if (params.getDateReceivedFrom() != null) {
             WHERE("a.date_received >= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");

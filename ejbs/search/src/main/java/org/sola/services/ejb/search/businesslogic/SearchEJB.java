@@ -925,6 +925,10 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_TO, searchParams.getDateReceivedTo());
         params.put(DraftingSearchResult.QUERY_PARAM_LOCATION, searchParams.getLocation());
         params.put(DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER, searchParams.getPlanNumber());
+        params.put(DraftingSearchResult.QUERY_SENT_TO, searchParams.getSentTo());
+        params.put(DraftingSearchResult.QUERY_SEND_DATE, searchParams.getSendDate());
+        params.put(DraftingSearchResult.QUERY_RETURN_DATE, searchParams.getReturnDate());
+        params.put(DraftingSearchResult.QUERY_PARAM_REFER_INTO, searchParams.getReferInfo());
 
         return getRepository().getEntityList(DraftingSearchResult.class, params);
     }

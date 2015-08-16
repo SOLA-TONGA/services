@@ -40,6 +40,9 @@ public class DraftingSearchParams extends AbstractEntity{
     private String natureOfSurvey;
     private String traceBy;
     private Date traceDate;
+    private String sentTo;
+    private Date sendDate;
+    private Date returnDate;
     private String drawDeed;
     private String deedNumber;
     private String plottingBy;
@@ -152,6 +155,30 @@ public class DraftingSearchParams extends AbstractEntity{
 
     public void setTraceDate(Date traceDate) {
         this.traceDate = traceDate;
+    }
+    
+    public String getSentTo() {
+        return sentTo;
+    }
+
+    public void setSentTo(String sentTo) {
+        this.sentTo = sentTo;
+    }
+    
+    public Date getSendDate() {
+        return sendDate;
+    }
+
+    public void setSendDate(Date sendDate) {
+        this.sendDate = sendDate;
+    }
+    
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
     }
 
     public String getDrawDeed() {
