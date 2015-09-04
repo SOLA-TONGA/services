@@ -40,6 +40,8 @@ import org.sola.services.ejb.search.repository.entities.BaUnitSearchParams;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchResult;
 import org.sola.services.ejb.search.repository.entities.DraftingSearchParams;
 import org.sola.services.ejb.search.repository.entities.DraftingSearchResult;
+import org.sola.services.ejb.search.repository.entities.MinisterInwardSearchParams;
+import org.sola.services.ejb.search.repository.entities.MinisterInwardSearchResult;
 import org.sola.services.ejb.search.repository.entities.PropertyVerifier;
 
 /**
@@ -1069,6 +1071,52 @@ public class SearchSqlProvider {
             WHERE("a.date_received <= #{" + DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
         }  
         ORDER_BY(DraftingSearchResult.QUERY_ORDER_BY
+                + " LIMIT 100");
+        sql = SQL();
+        return sql;
+    }
+    
+        /**
+     * Uses the Minister Inward Search parameters to build an appropriate SQL Query.
+     * This method does not inject the search parameter values into the SQL as
+     * that would prevent the database from performing statement caching.
+     *
+     * @param params Object containing the parameter values provided by the user
+     * @return SQL String
+     */
+    public static String buildSearchMinisterInwardSql(MinisterInwardSearchParams params) {
+        String sql;
+        BEGIN();
+        SELECT("a.subject");
+        SELECT("a.date_in");
+        SELECT("a.file_number");
+        SELECT("a.date_out");
+        SELECT("a.directed_division");
+        SELECT("a.directed_officer");
+        SELECT("a.ceo_direction");
+        SELECT("a.minister_direction");
+        SELECT("a.from_whom");
+        SELECT("a.remark");
+        FROM("application.minister_inward a");
+        if (!StringUtility.isEmpty(params.getSubject())) {
+            WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_SUBJECT
+                    + "}, COALESCE(a.subject, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getFileNumber())) {
+            WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_FILE_NUMBER
+                    + "}, COALESCE(a.file_number, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getFromWhom())) {
+            WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_FROM_WHOM
+                    + "}, COALESCE(a.subject, ''))");
+        }
+        if (params.getDateIn() != null) {
+            WHERE("a.date_in >= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_IN + "}");
+        }
+        if (params.getDateOut() != null) {
+            WHERE("a.date_out <= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT + "}");
+        }  
+        ORDER_BY(MinisterInwardSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
         sql = SQL();
         return sql;

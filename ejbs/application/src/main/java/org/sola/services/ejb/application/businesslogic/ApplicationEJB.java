@@ -1312,4 +1312,15 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
         return getRepository().saveEntity(drafting);
     }
     
+    @Override
+    public MinisterInward getMinisterInward(String id) {
+        return getRepository().getEntity(MinisterInward.class, id);
+    }
+    
+    @Override
+    @RolesAllowed(RolesConstants.MINISTER_INWARD_SEARCH)
+    public MinisterInward saveMinisterInward(MinisterInward ministerInward) {
+        return getRepository().saveEntity(ministerInward);
+    }
+    
 }

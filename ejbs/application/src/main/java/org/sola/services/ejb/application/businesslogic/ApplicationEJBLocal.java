@@ -271,5 +271,9 @@ public interface ApplicationEJBLocal extends AbstractEJBLocal {
     Drafting getDrafting(String id);
     
     Drafting saveDrafting(Drafting drafting);
+    
+    MinisterInward getMinisterInward(String id);
+    
+    MinisterInward saveMinisterInward(MinisterInward ministerInward);
 
 }

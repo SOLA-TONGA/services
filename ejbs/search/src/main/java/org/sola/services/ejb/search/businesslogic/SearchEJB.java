@@ -932,4 +932,23 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
         return getRepository().getEntityList(DraftingSearchResult.class, params);
     }
+    /**
+     * Executes a search across all drafting records that was migrated from the Drafting section database
+     *
+     * @param searchParams The search criteria to use.
+     */
+    @Override
+    @RolesAllowed({RolesConstants.MINISTER_INWARD_SEARCH})
+    public List<MinisterInwardSearchResult> searchMinisterInward(MinisterInwardSearchParams searchParams) {
+        Map params = new HashMap<String, Object>();
+
+        params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchMinisterInwardSql(searchParams));
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_SUBJECT, searchParams.getSubject());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_IN, searchParams.getDateIn());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT, searchParams.getDateOut());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_FILE_NUMBER, searchParams.getFileNumber());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_FROM_WHOM, searchParams.getFromWhom());
+
+        return getRepository().getEntityList(MinisterInwardSearchResult.class, params);
+    }
 }
