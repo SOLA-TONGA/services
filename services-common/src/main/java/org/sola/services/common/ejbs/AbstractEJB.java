@@ -49,6 +49,8 @@ import org.sola.services.common.repository.DatabaseConnectionManager;
 import org.sola.services.common.repository.entities.AbstractEntity;
 
 @DeclareRoles({
+    RolesConstants.MINISTER_INWARD_EDIT,
+    RolesConstants.MINISTER_INWARD_SEARCH,
     RolesConstants.DRAFTING_EDIT,
     RolesConstants.DRAFTING_SEARCH,
     RolesConstants.DASHBOARD_VIEW_ASSIGNED_APPS,
