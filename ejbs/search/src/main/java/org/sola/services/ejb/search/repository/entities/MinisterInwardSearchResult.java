@@ -29,6 +29,7 @@ package org.sola.services.ejb.search.repository.entities;
 
 import java.util.Date;
 import javax.persistence.Column;
+import javax.persistence.Id;
 import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 
 /**
@@ -36,7 +37,7 @@ import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
  * @author Admin
  */
 public class MinisterInwardSearchResult extends AbstractReadOnlyEntity{
-
+    public static final String QUERY_PARAM_ID = "id";
     public static final String QUERY_PARAM_SUBJECT = "subject";
     public static final String QUERY_PARAM_DATE_IN = "dateIn";
     public static final String QUERY_PARAM_FILE_NUMBER = "fileNumber";
@@ -49,7 +50,9 @@ public class MinisterInwardSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_REMARK = "remark";
     public static final String QUERY_ORDER_BY = "a.file_number";
 
-    
+    @Id
+    @Column(name = "id")
+    private String id;
     @Column(name = "subject")
     private String subject;
     @Column(name = "date_in")
@@ -74,7 +77,15 @@ public class MinisterInwardSearchResult extends AbstractReadOnlyEntity{
     public MinisterInwardSearchResult(){
         super();
     }
-
+    
+    public String getId() {
+        return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
     public String getSubject() {
         return subject;
     }

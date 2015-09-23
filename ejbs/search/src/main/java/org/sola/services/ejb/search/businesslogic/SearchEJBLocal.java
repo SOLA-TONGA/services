@@ -191,6 +191,8 @@ public interface SearchEJBLocal extends AbstractEJBLocal {
     List<DraftingSearchResult> searchDrafting(DraftingSearchParams searchParams);
     
     List<MinisterInwardSearchResult> searchMinisterInward(MinisterInwardSearchParams searchParams);
+    List<MinisterLeaseSearchResult> searchMinisterLease(MinisterLeaseSearchParams searchParams);
+
     /**
      * See {@linkplain SearchEJB#getExtentOfPublicDisplayMap(String)}.
      */

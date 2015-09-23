@@ -1318,9 +1318,19 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
     }
     
     @Override
-    @RolesAllowed(RolesConstants.MINISTER_INWARD_SEARCH)
+    @RolesAllowed(RolesConstants.MINISTER_EDIT)
     public MinisterInward saveMinisterInward(MinisterInward ministerInward) {
         return getRepository().saveEntity(ministerInward);
     }
     
+    @Override
+    public MinisterLease getMinisterLease(String id) {
+        return getRepository().getEntity(MinisterLease.class, id);
+    }
+    
+    @Override
+    @RolesAllowed(RolesConstants.MINISTER_EDIT)
+    public MinisterLease saveMinisterLease(MinisterLease ministerLease) {
+        return getRepository().saveEntity(ministerLease);
+    }
 }

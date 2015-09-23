@@ -273,7 +273,8 @@ public interface ApplicationEJBLocal extends AbstractEJBLocal {
     Drafting saveDrafting(Drafting drafting);
     
     MinisterInward getMinisterInward(String id);
-    
     MinisterInward saveMinisterInward(MinisterInward ministerInward);
+    MinisterLease getMinisterLease(String id);
+    MinisterLease saveMinisterLease(MinisterLease ministerLease);
 
 }

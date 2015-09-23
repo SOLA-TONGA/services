@@ -34,64 +34,65 @@ import org.sola.services.common.repository.entities.AbstractEntity;
  *
  * @author Admin
  */
-public class MinisterInwardSearchParams extends AbstractEntity{
-    private String id;
-    private String subject;
-    private Date dateIn;
-    private String fileNumber;
-    private Date dateOut;
-    private String fromWhom;
-    
-    public MinisterInwardSearchParams(){
+public class MinisterLeaseSearchParams extends AbstractEntity{
+    private Date dateReceivedFrom;
+    private Date dateReceivedTo;
+    private String name;
+    private String location;
+    private String receiptNumber;
+    private Date payDate;
+        
+    public MinisterLeaseSearchParams() {
         super();
     }
 
-    public String getId() {
-        return id;
+    public Date getDateReceivedFrom() {
+        return dateReceivedFrom;
+    }
+
+    public void setDateReceivedFrom(Date dateReceivedFrom) {
+        this.dateReceivedFrom = dateReceivedFrom;
+    }
+
+    public Date getDateReceivedTo() {
+        return dateReceivedTo;
+    }
+
+    public void setDateReceivedTo(Date dateReceivedTo) {
+        this.dateReceivedTo = dateReceivedTo;
     }
     
-    public void setId(String id) {
-        this.id = id;
-    }
-    
-    public String getSubject() {
-        return subject;
+
+    public String getName() {
+        return name;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Date getDateIn() {
-        return dateIn;
+    public String getLocation() {
+        return location;
     }
 
-    public void setDateIn(Date dateIn) {
-        this.dateIn = dateIn;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getFileNumber() {
-        return fileNumber;
+    public String getReceiptNumber() {
+        return receiptNumber;
     }
 
-    public void setFileNumber(String fileNumber) {
-        this.fileNumber = fileNumber;
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
     }
 
-    public Date getDateOut() {
-        return dateOut;
+    public Date getPayDate() {
+        return payDate;
     }
 
-    public void setDateOut(Date dateOut) {
-        this.dateOut = dateOut;
-    }
-
-    public String getFromWhom() {
-        return fromWhom;
-    }
-
-    public void setFromWhom(String fromWhom) {
-        this.fromWhom = fromWhom;
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
     }
     
 }

@@ -42,6 +42,8 @@ import org.sola.services.ejb.search.repository.entities.DraftingSearchParams;
 import org.sola.services.ejb.search.repository.entities.DraftingSearchResult;
 import org.sola.services.ejb.search.repository.entities.MinisterInwardSearchParams;
 import org.sola.services.ejb.search.repository.entities.MinisterInwardSearchResult;
+import org.sola.services.ejb.search.repository.entities.MinisterLeaseSearchParams;
+import org.sola.services.ejb.search.repository.entities.MinisterLeaseSearchResult;
 import org.sola.services.ejb.search.repository.entities.PropertyVerifier;
 
 /**
@@ -1087,6 +1089,7 @@ public class SearchSqlProvider {
     public static String buildSearchMinisterInwardSql(MinisterInwardSearchParams params) {
         String sql;
         BEGIN();
+        SELECT("a.id");
         SELECT("a.subject");
         SELECT("a.date_in");
         SELECT("a.file_number");
@@ -1098,6 +1101,10 @@ public class SearchSqlProvider {
         SELECT("a.from_whom");
         SELECT("a.remark");
         FROM("application.minister_inward a");
+        if (!StringUtility.isEmpty(params.getId())) {
+            WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_ID
+                    + "}, COALESCE(a.id, ''))");
+        }
         if (!StringUtility.isEmpty(params.getSubject())) {
             WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_SUBJECT
                     + "}, COALESCE(a.subject, ''))");
@@ -1108,7 +1115,7 @@ public class SearchSqlProvider {
         }
         if (!StringUtility.isEmpty(params.getFromWhom())) {
             WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_FROM_WHOM
-                    + "}, COALESCE(a.subject, ''))");
+                    + "}, COALESCE(a.from_whom, ''))");
         }
         if (params.getDateIn() != null) {
             WHERE("a.date_in >= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_IN + "}");
@@ -1117,6 +1124,52 @@ public class SearchSqlProvider {
             WHERE("a.date_out <= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT + "}");
         }  
         ORDER_BY(MinisterInwardSearchResult.QUERY_ORDER_BY
+                + " LIMIT 100");
+        sql = SQL();
+        return sql;
+    }
+    
+    public static String buildSearchMinisterLeaseSql(MinisterLeaseSearchParams params) {
+        String sql;
+        BEGIN();
+        SELECT("a.id");
+        SELECT("a.date_received");
+        SELECT("a.name");
+        SELECT("a.purpose");
+        SELECT("a.location");
+        SELECT("a.noble");
+        SELECT("a.land_type");
+        SELECT("a.total_area");
+        SELECT("a.lease_area");
+        SELECT("a.rent");
+        SELECT("a.survey_fee");
+        SELECT("a.receipt_number");
+        SELECT("a.pay_date");
+        SELECT("a.ceo_direction");
+        SELECT("a.directed_division");
+        SELECT("a.remark");
+        FROM("application.minister_inward a");
+        if (!StringUtility.isEmpty(params.getName())) {
+            WHERE("compare_strings(#{" + MinisterLeaseSearchResult.QUERY_PARAM_NAME
+                    + "}, COALESCE(a.name, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getLocation())) {
+            WHERE("compare_strings(#{" + MinisterLeaseSearchResult.QUERY_PARAM_LOCATION
+                    + "}, COALESCE(a.location, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getReceiptNumber())) {
+            WHERE("compare_strings(#{" + MinisterLeaseSearchResult.QUERY_PARAM_RECEIPT_NUMBER
+                    + "}, COALESCE(a.receipt_number, ''))");
+        }
+
+        if (params.getDateReceivedFrom() != null) {
+            WHERE("a.date_received >= #{" + MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");
+        }
+        
+        if (params.getDateReceivedTo() != null) {
+            WHERE("a.date_received <= #{" + MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
+        } 
+        ORDER_BY(MinisterLeaseSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
         sql = SQL();
         return sql;

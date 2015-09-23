@@ -921,8 +921,6 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(DraftingSearchResult.QUERY_PARAM_ITEM_NUMBER, searchParams.getItemNumber());
         params.put(DraftingSearchResult.QUERY_PARAM_FIRST_NAME, searchParams.getFirstName());
         params.put(DraftingSearchResult.QUERY_PARAM_LAST_NAME, searchParams.getLastName());
-        params.put(DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM, searchParams.getDateReceivedFrom());
-        params.put(DraftingSearchResult.QUERY_PARAM_DATE_RECEIVED_TO, searchParams.getDateReceivedTo());
         params.put(DraftingSearchResult.QUERY_PARAM_LOCATION, searchParams.getLocation());
         params.put(DraftingSearchResult.QUERY_PARAM_PLAN_NUMBER, searchParams.getPlanNumber());
         params.put(DraftingSearchResult.QUERY_SENT_TO, searchParams.getSentTo());
@@ -932,13 +930,14 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
         return getRepository().getEntityList(DraftingSearchResult.class, params);
     }
+    
     /**
-     * Executes a search across all drafting records that was migrated from the Drafting section database
+     * Executes a search across all minister records that was migrated from the Minister section database
      *
      * @param searchParams The search criteria to use.
      */
     @Override
-    @RolesAllowed({RolesConstants.MINISTER_INWARD_SEARCH})
+    @RolesAllowed({RolesConstants.MINISTER_SEARCH})
     public List<MinisterInwardSearchResult> searchMinisterInward(MinisterInwardSearchParams searchParams) {
         Map params = new HashMap<String, Object>();
 
@@ -950,5 +949,26 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(MinisterInwardSearchResult.QUERY_PARAM_FROM_WHOM, searchParams.getFromWhom());
 
         return getRepository().getEntityList(MinisterInwardSearchResult.class, params);
+    }
+    
+    /**
+     * Executes a search across all minister records that was migrated from the Minister section database
+     *
+     * @param searchParams The search criteria to use.
+     */
+    @Override
+    @RolesAllowed({RolesConstants.MINISTER_SEARCH})
+    public List<MinisterLeaseSearchResult> searchMinisterLease(MinisterLeaseSearchParams searchParams) {
+        Map params = new HashMap<String, Object>();
+
+        params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchMinisterLeaseSql(searchParams));
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_NAME, searchParams.getName());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_LOCATION, searchParams.getLocation());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM, searchParams.getDateReceivedFrom());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_TO, searchParams.getDateReceivedTo());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_RECEIPT_NUMBER, searchParams.getReceiptNumber());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE, searchParams.getPayDate());
+
+        return getRepository().getEntityList(MinisterLeaseSearchResult.class, params);
     }
 }

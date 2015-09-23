@@ -41,41 +41,48 @@ import org.sola.services.common.repository.entities.AbstractVersionedEntity;
  *
  * @author Admin
  */
-@Table(name = "minister_inward", schema = "application")
-public class MinisterInward extends AbstractVersionedEntity{
-    
+@Table(name = "minister_lease", schema = "application")
+public class MinisterLease extends AbstractVersionedEntity{
     @Id
     @Column(name = "id")
     private String id;
     @Column(name = "service_id")
     private String serviceId;
-    @Column(name = "subject")
-    private String subject;
-    @Column(name = "date_in")
-    private Date dateIn;
-    @Column(name = "file_number")
-    private String fileNumber;
-    @Column(name = "date_out")
-    private Date dateOut;
-    @Column(name = "directed_division")
-    private String directedDivision;
-    @Column(name = "directed_officer")
-    private String directedOfficer;
+    @Column(name = "date_received")
+    private Date dateReceived;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "purpose")
+    private String purpose;
+    @Column(name = "location")
+    private String location;
+    @Column(name = "noble")
+    private String noble;
+    @Column(name = "land_type")
+    private String landType;
+    @Column(name = "total_area")
+    private String totalArea;
+    @Column(name = "lease_area")
+    private String leaseArea;
+    @Column(name = "rent")
+    private String rent;
+    @Column(name = "survey_fee")
+    private String surveyFee;
+    @Column(name = "receipt_number")
+    private String receiptNumber;
+    @Column(name = "pay_date")
+    private Date payDate;
     @Column(name = "ceo_direction")
     private String ceoDirection;
-    @Column(name = "minister_direction")
-    private String ministerDirection;
-    @Column(name = "from_whom")
-    private String fromWhom;
+    @Column(name = "directed_division")
+    private String directedDivision;
     @Column(name = "remark")
     private String remark;
-    @Column(name = "comment")
-    private String comment;
     
-    public MinisterInward(){
+    public MinisterLease() {
         super();
     }
-
+    
     public String getId() {
         id = id == null ? generateId() : id;
         return id;
@@ -93,52 +100,100 @@ public class MinisterInward extends AbstractVersionedEntity{
         this.serviceId = serviceId;
     }
 
-    public String getSubject() {
-        return subject;
+    public Date getDateReceived() {
+        return dateReceived;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
+    public void setDateReceived(Date dateReceived) {
+        this.dateReceived = dateReceived;
     }
 
-    public Date getDateIn() {
-        return dateIn;
+    public String getName() {
+        return name;
     }
 
-    public void setDateIn(Date dateIn) {
-        this.dateIn = dateIn;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getFileNumber() {
-        return fileNumber;
+    public String getPurpose() {
+        return purpose;
     }
 
-    public void setFileNumber(String fileNumber) {
-        this.fileNumber = fileNumber;
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 
-    public Date getDateOut() {
-        return dateOut;
+    public String getLocation() {
+        return location;
     }
 
-    public void setDateOut(Date dateOut) {
-        this.dateOut = dateOut;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getDirectedDivision() {
-        return directedDivision;
+    public String getNoble() {
+        return noble;
     }
 
-    public void setDirectedDivision(String directedDivision) {
-        this.directedDivision = directedDivision;
+    public void setNoble(String noble) {
+        this.noble = noble;
     }
 
-    public String getDirectedOfficer() {
-        return directedOfficer;
+    public String getLandType() {
+        return landType;
     }
 
-    public void setDirectedOfficer(String directedOfficer) {
-        this.directedOfficer = directedOfficer;
+    public void setLandType(String landType) {
+        this.landType = landType;
+    }
+
+    public String getTotalArea() {
+        return totalArea;
+    }
+
+    public void setTotalArea(String totalArea) {
+        this.totalArea = totalArea;
+    }
+
+    public String getLeaseArea() {
+        return leaseArea;
+    }
+
+    public void setLeaseArea(String leaseArea) {
+        this.leaseArea = leaseArea;
+    }
+
+    public String getRent() {
+        return rent;
+    }
+
+    public void setRent(String rent) {
+        this.rent = rent;
+    }
+
+    public String getSurveyFee() {
+        return surveyFee;
+    }
+
+    public void setSurveyFee(String surveyFee) {
+        this.surveyFee = surveyFee;
+    }
+
+    public String getReceiptNumber() {
+        return receiptNumber;
+    }
+
+    public void setReceiptNumber(String receiptNumber) {
+        this.receiptNumber = receiptNumber;
+    }
+
+    public Date getPayDate() {
+        return payDate;
+    }
+
+    public void setPayDate(Date payDate) {
+        this.payDate = payDate;
     }
 
     public String getCeoDirection() {
@@ -149,20 +204,12 @@ public class MinisterInward extends AbstractVersionedEntity{
         this.ceoDirection = ceoDirection;
     }
 
-    public String getMinisterDirection() {
-        return ministerDirection;
+    public String getDirectedDivision() {
+        return directedDivision;
     }
 
-    public void setMinisterDirection(String ministerDirection) {
-        this.ministerDirection = ministerDirection;
-    }
-
-    public String getFromWhom() {
-        return fromWhom;
-    }
-
-    public void setFromWhom(String fromWhom) {
-        this.fromWhom = fromWhom;
+    public void setDirectedDivision(String directedDivision) {
+        this.directedDivision = directedDivision;
     }
 
     public String getRemark() {
@@ -173,12 +220,4 @@ public class MinisterInward extends AbstractVersionedEntity{
         this.remark = remark;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-    
 }

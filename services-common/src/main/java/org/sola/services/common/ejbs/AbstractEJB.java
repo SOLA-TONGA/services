@@ -39,7 +39,6 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 import org.sola.common.RolesConstants;
 import org.sola.common.SOLAException;
-import org.sola.common.logging.LogUtility;
 import org.sola.common.messaging.ServiceMessage;
 import org.sola.services.common.LocalInfo;
 import org.sola.services.common.repository.entities.AbstractCodeEntity;
@@ -49,8 +48,8 @@ import org.sola.services.common.repository.DatabaseConnectionManager;
 import org.sola.services.common.repository.entities.AbstractEntity;
 
 @DeclareRoles({
-    RolesConstants.MINISTER_INWARD_EDIT,
-    RolesConstants.MINISTER_INWARD_SEARCH,
+    RolesConstants.MINISTER_EDIT,
+    RolesConstants.MINISTER_SEARCH,
     RolesConstants.DRAFTING_EDIT,
     RolesConstants.DRAFTING_SEARCH,
     RolesConstants.DASHBOARD_VIEW_ASSIGNED_APPS,
