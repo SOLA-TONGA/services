@@ -1333,4 +1333,15 @@ public class ApplicationEJB extends AbstractEJB implements ApplicationEJBLocal {
     public MinisterLease saveMinisterLease(MinisterLease ministerLease) {
         return getRepository().saveEntity(ministerLease);
     }
+    
+    @Override
+    public MinisterApplication getMinisterApplication(String id) {
+        return getRepository().getEntity(MinisterApplication.class, id);
+    }
+    
+    @Override
+    @RolesAllowed(RolesConstants.MINISTER_EDIT)
+    public MinisterApplication saveMinisterApplication(MinisterApplication ministerApplication) {
+        return getRepository().saveEntity(ministerApplication);
+    }
 }

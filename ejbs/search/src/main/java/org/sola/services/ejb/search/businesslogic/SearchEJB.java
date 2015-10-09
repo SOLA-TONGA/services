@@ -971,4 +971,20 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
         return getRepository().getEntityList(MinisterLeaseSearchResult.class, params);
     }
+    
+    @Override
+    @RolesAllowed({RolesConstants.MINISTER_SEARCH})
+    public List<MinisterApplicationSearchResult> searchMinisterApplication(MinisterApplicationSearchParams searchParams) {
+        Map params = new HashMap<String, Object>();
+
+        params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchMinisterApplicationSql(searchParams));
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_NAME, searchParams.getName());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_LOCATION, searchParams.getLocation());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM, searchParams.getDateReceivedFrom());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_DATE_RECEIVED_TO, searchParams.getDateReceivedTo());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_RECEIPT_NUMBER, searchParams.getReceiptNumber());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE, searchParams.getPayDate());
+
+        return getRepository().getEntityList(MinisterApplicationSearchResult.class, params);
+    }
 }

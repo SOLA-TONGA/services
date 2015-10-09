@@ -40,6 +40,8 @@ import org.sola.services.ejb.search.repository.entities.BaUnitSearchParams;
 import org.sola.services.ejb.search.repository.entities.BaUnitSearchResult;
 import org.sola.services.ejb.search.repository.entities.DraftingSearchParams;
 import org.sola.services.ejb.search.repository.entities.DraftingSearchResult;
+import org.sola.services.ejb.search.repository.entities.MinisterApplicationSearchParams;
+import org.sola.services.ejb.search.repository.entities.MinisterApplicationSearchResult;
 import org.sola.services.ejb.search.repository.entities.MinisterInwardSearchParams;
 import org.sola.services.ejb.search.repository.entities.MinisterInwardSearchResult;
 import org.sola.services.ejb.search.repository.entities.MinisterLeaseSearchParams;
@@ -1148,7 +1150,7 @@ public class SearchSqlProvider {
         SELECT("a.ceo_direction");
         SELECT("a.directed_division");
         SELECT("a.remark");
-        FROM("application.minister_inward a");
+        FROM("application.minister_lease a");
         if (!StringUtility.isEmpty(params.getName())) {
             WHERE("compare_strings(#{" + MinisterLeaseSearchResult.QUERY_PARAM_NAME
                     + "}, COALESCE(a.name, ''))");
@@ -1161,7 +1163,11 @@ public class SearchSqlProvider {
             WHERE("compare_strings(#{" + MinisterLeaseSearchResult.QUERY_PARAM_RECEIPT_NUMBER
                     + "}, COALESCE(a.receipt_number, ''))");
         }
-
+        
+        if (params.getPayDate() != null) {
+            WHERE("a.pay_date = #{" + MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE + "}");
+        }
+        
         if (params.getDateReceivedFrom() != null) {
             WHERE("a.date_received >= #{" + MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");
         }
@@ -1170,6 +1176,54 @@ public class SearchSqlProvider {
             WHERE("a.date_received <= #{" + MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
         } 
         ORDER_BY(MinisterLeaseSearchResult.QUERY_ORDER_BY
+                + " LIMIT 100");
+        sql = SQL();
+        return sql;
+    }
+    
+    public static String buildSearchMinisterApplicationSql(MinisterApplicationSearchParams params) {
+        String sql;
+        BEGIN();
+        SELECT("a.id");
+        SELECT("a.date_received");
+        SELECT("a.name");
+        SELECT("a.location");
+        SELECT("a.land_type");
+        SELECT("a.noble");
+        SELECT("a.land_area");
+        SELECT("a.sign_date");
+        SELECT("a.survey_fee");
+        SELECT("a.receipt_number");
+        SELECT("a.pay_date");
+        SELECT("a.last_reg");
+        SELECT("a.ceo_direction");
+        SELECT("a.directed_division");
+        FROM("application.minister_application a");
+        if (!StringUtility.isEmpty(params.getName())) {
+            WHERE("compare_strings(#{" + MinisterApplicationSearchResult.QUERY_PARAM_NAME
+                    + "}, COALESCE(a.name, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getLocation())) {
+            WHERE("compare_strings(#{" + MinisterApplicationSearchResult.QUERY_PARAM_LOCATION
+                    + "}, COALESCE(a.location, ''))");
+        }
+        if (!StringUtility.isEmpty(params.getReceiptNumber())) {
+            WHERE("compare_strings(#{" + MinisterApplicationSearchResult.QUERY_PARAM_RECEIPT_NUMBER
+                    + "}, COALESCE(a.receipt_number, ''))");
+        }
+        
+        if (params.getPayDate() != null) {
+            WHERE("a.pay_date = #{" + MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE + "}");
+        }
+        
+        if (params.getDateReceivedFrom() != null) {
+            WHERE("a.date_received >= #{" + MinisterApplicationSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM + "}");
+        }
+        
+        if (params.getDateReceivedTo() != null) {
+            WHERE("a.date_received <= #{" + MinisterApplicationSearchResult.QUERY_PARAM_DATE_RECEIVED_TO + "}");
+        } 
+        ORDER_BY(MinisterApplicationSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
         sql = SQL();
         return sql;
