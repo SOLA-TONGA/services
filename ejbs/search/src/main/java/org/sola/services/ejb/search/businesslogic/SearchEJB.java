@@ -943,8 +943,10 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
 
         params.put(CommonSqlProvider.PARAM_QUERY, SearchSqlProvider.buildSearchMinisterInwardSql(searchParams));
         params.put(MinisterInwardSearchResult.QUERY_PARAM_SUBJECT, searchParams.getSubject());
-        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_IN, searchParams.getDateIn());
-        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT, searchParams.getDateOut());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_IN_FROM, searchParams.getDateInFrom());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_IN_TO, searchParams.getDateInTo());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT_FROM, searchParams.getDateOutFrom());
+        params.put(MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT_TO, searchParams.getDateOutTo());
         params.put(MinisterInwardSearchResult.QUERY_PARAM_FILE_NUMBER, searchParams.getFileNumber());
         params.put(MinisterInwardSearchResult.QUERY_PARAM_FROM_WHOM, searchParams.getFromWhom());
 
@@ -967,7 +969,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM, searchParams.getDateReceivedFrom());
         params.put(MinisterLeaseSearchResult.QUERY_PARAM_DATE_RECEIVED_TO, searchParams.getDateReceivedTo());
         params.put(MinisterLeaseSearchResult.QUERY_PARAM_RECEIPT_NUMBER, searchParams.getReceiptNumber());
-        params.put(MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE, searchParams.getPayDate());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE_FROM, searchParams.getPayDateFrom());
+        params.put(MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE_TO, searchParams.getPayDateTo());
 
         return getRepository().getEntityList(MinisterLeaseSearchResult.class, params);
     }
@@ -983,7 +986,8 @@ public class SearchEJB extends AbstractEJB implements SearchEJBLocal {
         params.put(MinisterApplicationSearchResult.QUERY_PARAM_DATE_RECEIVED_FROM, searchParams.getDateReceivedFrom());
         params.put(MinisterApplicationSearchResult.QUERY_PARAM_DATE_RECEIVED_TO, searchParams.getDateReceivedTo());
         params.put(MinisterApplicationSearchResult.QUERY_PARAM_RECEIPT_NUMBER, searchParams.getReceiptNumber());
-        params.put(MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE, searchParams.getPayDate());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE_FROM, searchParams.getPayDateFrom());
+        params.put(MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE_TO, searchParams.getPayDateTo());
 
         return getRepository().getEntityList(MinisterApplicationSearchResult.class, params);
     }

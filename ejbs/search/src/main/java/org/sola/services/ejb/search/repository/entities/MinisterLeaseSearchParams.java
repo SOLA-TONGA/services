@@ -40,7 +40,8 @@ public class MinisterLeaseSearchParams extends AbstractEntity{
     private String name;
     private String location;
     private String receiptNumber;
-    private Date payDate;
+    private Date payDateFrom;
+    private Date payDateTo;
         
     public MinisterLeaseSearchParams() {
         super();
@@ -87,12 +88,20 @@ public class MinisterLeaseSearchParams extends AbstractEntity{
         this.receiptNumber = receiptNumber;
     }
 
-    public Date getPayDate() {
-        return payDate;
+    public Date getPayDateFrom() {
+        return payDateFrom;
     }
 
-    public void setPayDate(Date payDate) {
-        this.payDate = payDate;
+    public void setPayDateFrom(Date payDateFrom) {
+        this.payDateFrom = payDateFrom;
     }
-    
+
+    public Date getPayDateTo() {
+        return payDateTo;
+    }
+
+    public void setPayDateTo(Date payDateTo) {
+        this.payDateTo = payDateTo;
+    }
+
 }

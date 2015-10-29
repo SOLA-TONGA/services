@@ -48,7 +48,8 @@ public class MinisterApplicationSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_SIGN_DATE = "signDate";
     public static final String QUERY_PARAM_SURVEY_FEE = "surveyFee";
     public static final String QUERY_PARAM_RECEIPT_NUMBER = "receiptNumber";
-    public static final String QUERY_PARAM_PAY_DATE = "payDate";
+    public static final String QUERY_PARAM_PAY_DATE_FROM = "payDateFrom";
+    public static final String QUERY_PARAM_PAY_DATE_TO = "payDateTo";
     public static final String QUERY_PARAM_LAST_REG = "lastReg";
     public static final String QUERY_PARAM_CEO_DIRECTION = "ceoDirection";
     public static final String QUERY_PARAM_DIRECTED_DIVISION = "directedDivision";

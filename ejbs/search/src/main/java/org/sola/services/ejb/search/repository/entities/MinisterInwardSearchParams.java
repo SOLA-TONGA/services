@@ -37,9 +37,11 @@ import org.sola.services.common.repository.entities.AbstractEntity;
 public class MinisterInwardSearchParams extends AbstractEntity{
     private String id;
     private String subject;
-    private Date dateIn;
+    private Date dateInFrom;
+    private Date dateInTo;
     private String fileNumber;
-    private Date dateOut;
+    private Date dateOutFrom;
+    private Date dateOutTo;
     private String fromWhom;
     
     public MinisterInwardSearchParams(){
@@ -62,14 +64,6 @@ public class MinisterInwardSearchParams extends AbstractEntity{
         this.subject = subject;
     }
 
-    public Date getDateIn() {
-        return dateIn;
-    }
-
-    public void setDateIn(Date dateIn) {
-        this.dateIn = dateIn;
-    }
-
     public String getFileNumber() {
         return fileNumber;
     }
@@ -78,20 +72,44 @@ public class MinisterInwardSearchParams extends AbstractEntity{
         this.fileNumber = fileNumber;
     }
 
-    public Date getDateOut() {
-        return dateOut;
-    }
-
-    public void setDateOut(Date dateOut) {
-        this.dateOut = dateOut;
-    }
-
     public String getFromWhom() {
         return fromWhom;
     }
 
     public void setFromWhom(String fromWhom) {
         this.fromWhom = fromWhom;
+    }
+
+    public Date getDateInFrom() {
+        return dateInFrom;
+    }
+
+    public void setDateInFrom(Date dateInFrom) {
+        this.dateInFrom = dateInFrom;
+    }
+
+    public Date getDateInTo() {
+        return dateInTo;
+    }
+
+    public void setDateInTo(Date dateInTo) {
+        this.dateInTo = dateInTo;
+    }
+
+    public Date getDateOutFrom() {
+        return dateOutFrom;
+    }
+
+    public void setDateOutFrom(Date dateOutFrom) {
+        this.dateOutFrom = dateOutFrom;
+    }
+
+    public Date getDateOutTo() {
+        return dateOutTo;
+    }
+
+    public void setDateOutTo(Date dateOutTo) {
+        this.dateOutTo = dateOutTo;
     }
     
 }

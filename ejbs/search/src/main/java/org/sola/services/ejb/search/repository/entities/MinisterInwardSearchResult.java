@@ -39,9 +39,11 @@ import org.sola.services.common.repository.entities.AbstractReadOnlyEntity;
 public class MinisterInwardSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_ID = "id";
     public static final String QUERY_PARAM_SUBJECT = "subject";
-    public static final String QUERY_PARAM_DATE_IN = "dateIn";
+    public static final String QUERY_PARAM_DATE_IN_FROM = "dateInFrom";
+    public static final String QUERY_PARAM_DATE_IN_TO = "dateInTo";
     public static final String QUERY_PARAM_FILE_NUMBER = "fileNumber";
-    public static final String QUERY_PARAM_DATE_OUT = "dateOut";
+    public static final String QUERY_PARAM_DATE_OUT_FROM = "dateOutFrom";
+    public static final String QUERY_PARAM_DATE_OUT_TO = "dateOutTo";
     public static final String QUERY_PARAM_DIRECTED_DIVISION = "directedDivision";
     public static final String QUERY_PARAM_DIRECTED_OFFICER = "directedOfficer";
     public static final String QUERY_PARAM_CEO_DIRECTION = "ceoDirection";

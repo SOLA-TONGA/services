@@ -1119,11 +1119,17 @@ public class SearchSqlProvider {
             WHERE("compare_strings(#{" + MinisterInwardSearchResult.QUERY_PARAM_FROM_WHOM
                     + "}, COALESCE(a.from_whom, ''))");
         }
-        if (params.getDateIn() != null) {
-            WHERE("a.date_in >= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_IN + "}");
+        if (params.getDateInFrom() != null) {
+            WHERE("a.date_in >= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_IN_FROM + "}");
         }
-        if (params.getDateOut() != null) {
-            WHERE("a.date_out <= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT + "}");
+        if (params.getDateInTo() != null) {
+            WHERE("a.date_in <= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_IN_TO + "}");
+        }  
+        if (params.getDateOutFrom() != null) {
+            WHERE("a.date_out >= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT_FROM + "}");
+        }
+        if (params.getDateOutTo() != null) {
+            WHERE("a.date_out <= #{" + MinisterInwardSearchResult.QUERY_PARAM_DATE_OUT_TO + "}");
         }  
         ORDER_BY(MinisterInwardSearchResult.QUERY_ORDER_BY
                 + " LIMIT 100");
@@ -1164,8 +1170,12 @@ public class SearchSqlProvider {
                     + "}, COALESCE(a.receipt_number, ''))");
         }
         
-        if (params.getPayDate() != null) {
-            WHERE("a.pay_date = #{" + MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE + "}");
+        if (params.getPayDateFrom() != null) {
+            WHERE("a.pay_date >= #{" + MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE_FROM + "}");
+        }
+        
+        if (params.getPayDateTo() != null) {
+            WHERE("a.pay_date <= #{" + MinisterLeaseSearchResult.QUERY_PARAM_PAY_DATE_TO + "}");
         }
         
         if (params.getDateReceivedFrom() != null) {
@@ -1212,8 +1222,12 @@ public class SearchSqlProvider {
                     + "}, COALESCE(a.receipt_number, ''))");
         }
         
-        if (params.getPayDate() != null) {
-            WHERE("a.pay_date = #{" + MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE + "}");
+        if (params.getPayDateFrom() != null) {
+            WHERE("a.pay_date >= #{" + MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE_FROM + "}");
+        }
+        
+        if (params.getPayDateTo() != null) {
+            WHERE("a.pay_date <= #{" + MinisterApplicationSearchResult.QUERY_PARAM_PAY_DATE_TO + "}");
         }
         
         if (params.getDateReceivedFrom() != null) {
