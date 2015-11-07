@@ -1149,6 +1149,7 @@ public class SearchSqlProvider {
         SELECT("a.land_type");
         SELECT("a.total_area");
         SELECT("a.lease_area");
+        SELECT("a.term");
         SELECT("a.rent");
         SELECT("a.survey_fee");
         SELECT("a.receipt_number");

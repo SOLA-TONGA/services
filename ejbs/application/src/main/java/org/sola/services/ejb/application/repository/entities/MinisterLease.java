@@ -64,6 +64,8 @@ public class MinisterLease extends AbstractVersionedEntity{
     private String totalArea;
     @Column(name = "lease_area")
     private String leaseArea;
+    @Column(name = "term")
+    private String term;
     @Column(name = "rent")
     private String rent;
     @Column(name = "survey_fee")
@@ -162,6 +164,14 @@ public class MinisterLease extends AbstractVersionedEntity{
 
     public void setLeaseArea(String leaseArea) {
         this.leaseArea = leaseArea;
+    }
+    
+    public String getTerm() {
+        return term;
+    }
+
+    public void setTerm(String term) {
+        this.term = term;
     }
 
     public String getRent() {

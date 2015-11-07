@@ -47,6 +47,7 @@ public class MinisterLeaseSearchResult extends AbstractReadOnlyEntity{
     public static final String QUERY_PARAM_LAND_TYPE = "landType";
     public static final String QUERY_PARAM_TOTAL_AREA = "totalArea";
     public static final String QUERY_PARAM_LEASE_AREA = "leaseArea";
+    public static final String QUERY_PARAM_TERM = "term";
     public static final String QUERY_PARAM_RENT = "rent";
     public static final String QUERY_PARAM_SURVEY_FEE = "surveyFee";
     public static final String QUERY_PARAM_RECEIPT_NUMBER = "receiptNumber";
@@ -76,6 +77,8 @@ public class MinisterLeaseSearchResult extends AbstractReadOnlyEntity{
     private String totalArea;
     @Column(name = "lease_area")
     private String leaseArea;
+    @Column(name = "term")
+    private String term;
     @Column(name = "rent")
     private String rent;
     @Column(name = "survey_fee")
@@ -161,6 +164,14 @@ public class MinisterLeaseSearchResult extends AbstractReadOnlyEntity{
 
     public void setLeaseArea(String leaseArea) {
         this.leaseArea = leaseArea;
+    }
+
+    public String getTerm() {
+        return term;
+    }
+
+    public void setTerm(String term) {
+        this.term = term;
     }
 
     public String getRent() {
